@@ -37,6 +37,7 @@ var renderer;
 var camera;
 var play;
 var menu;
+var over;
 var stats;
 var canvas;
 var assets;

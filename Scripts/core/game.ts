@@ -42,6 +42,7 @@ var camera: PerspectiveCamera;
 
 var play: scenes.Play;
 var menu: scenes.Menu;
+var over: scenes.Over;
 
 var stats: Stats;
 var canvas: HTMLElement;

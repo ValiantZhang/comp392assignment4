@@ -23,6 +23,7 @@ var scenes;
          */
         function Play() {
             _super.call(this);
+            this.creator = new builder.Creator();
             this._initialize();
             this.start();
         }
@@ -168,6 +169,9 @@ var scenes;
             this.deathPlane.position.set(0, -10, 0);
             this.deathPlane.name = "DeathPlane";
             this.add(this.deathPlane);
+        };
+        Play.prototype.generateLevel = function () {
+            this.creator.createCube(1, 1, 1, 1, 0, this);
         };
         /**
          * This method adds a coin to the scene

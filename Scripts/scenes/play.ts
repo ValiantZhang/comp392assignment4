@@ -46,7 +46,9 @@ module scenes {
         private livesLabel: createjs.Text;
         private scoreValue: number;
         private livesValue: number;
+        private creator :builder.Creator = new builder.Creator();
 
+        
         /**
          * @constructor
          */
@@ -226,6 +228,12 @@ module scenes {
             this.deathPlane.name = "DeathPlane";
             this.add(this.deathPlane);
         }
+        
+       
+        private generateLevel():void{
+            this.creator.createCube(1,1,1,1,0,this);
+        }
+        
 
         /**
          * This method adds a coin to the scene

@@ -1,13 +1,15 @@
 {
-  "name": "comp392-lesson10",
+  "name": "Isoperimetric Inequality",
   "authors": [
-    "Tom Tsiliopoulos <tsiliopoulos@hotmail.com>"
+    "Ilmir Taychinov"+
+    "Jacky Zhang"+
+    "Josh Bender"
   ],
-  "description": "COMP392 Lesson 9 for Advanced Graphics",
+  "description": "COMP392A4",
   "main": "",
   "moduleType": [],
   "license": "MIT",
-  "homepage": "https://github.com/CentennialCollege/COMP392-Lesson10",
+  "homepage": "https://github.com/ValiantZhang/comp392assignment4",
   "ignore": [
     "**/.*",
     "node_modules",
