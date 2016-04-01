@@ -22,6 +22,7 @@ import Line = THREE.Line;
 import Mesh = THREE.Mesh;
 import Object3D = THREE.Object3D;
 import SpotLight = THREE.SpotLight;
+import DirectionalLight = THREE.DirectionalLight;
 import PointLight = THREE.PointLight;
 import AmbientLight = THREE.AmbientLight;
 import Color = THREE.Color;
@@ -52,7 +53,12 @@ var manifest = [
     { id: "hit", src: "../../Assets/audio/hit.wav" },
     { id: "coin", src: "../../Assets/audio/coin.mp3" },
     { id: "jump", src: "../../Assets/audio/Jump.wav" },
-    { id: "StartButton", src: "../../Assets/images/StartButton.png"}
+    { id: "StartButton", src: "../../Assets/images/StartButton.png"},
+    { id: "TutorialButton", src: "../../Assets/images/tutorial.png"},
+    { id: "Level1Button", src: "../../Assets/images/level1.png"},
+    { id: "Level2Button", src: "../../Assets/images/level2.png"},
+    { id: "Level3Button", src: "../../Assets/images/level3.png"},
+    { id: "Logo", src: "../../Assets/images/logo.png"}
 ];
 
 function preload(): void {
@@ -129,7 +135,7 @@ function gameLoop(): void {
 // Setup default renderer
 function setupRenderer(): void {
     renderer = new Renderer({ antialias: true });
-    renderer.setClearColor(0x404040, 1.0);
+    renderer.setClearColor(0x323776, 1.0);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(CScreen.WIDTH, CScreen.HEIGHT);
     renderer.shadowMap.enabled = true;

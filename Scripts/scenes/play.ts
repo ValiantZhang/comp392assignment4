@@ -16,7 +16,8 @@ module scenes {
 
         private blocker: HTMLElement;
         private instructions: HTMLElement;
-        private spotLight: SpotLight;
+        private directionLight: DirectionalLight;
+        private ambientLight: AmbientLight;
         private groundGeometry: CubeGeometry;
         private groundPhysicsMaterial: Physijs.Material;
         private groundMaterial: PhongMaterial;
@@ -136,30 +137,42 @@ module scenes {
         }
 
         /**
-         * Add a spotLight to the scene
+         * Add a directional light to the scene
          * 
-         * @method addSpotLight
+         * @method addDirectionalLight
          * @return void
          */
-        private addSpotLight(): void {
-            // Spot Light
-            this.spotLight = new SpotLight(0xffffff);
-            this.spotLight.position.set(20, 40, -15);
-            this.spotLight.castShadow = true;
-            this.spotLight.intensity = 2;
-            this.spotLight.lookAt(new Vector3(0, 0, 0));
-            this.spotLight.shadowCameraNear = 2;
-            this.spotLight.shadowCameraFar = 200;
-            this.spotLight.shadowCameraLeft = -5;
-            this.spotLight.shadowCameraRight = 5;
-            this.spotLight.shadowCameraTop = 5;
-            this.spotLight.shadowCameraBottom = -5;
-            this.spotLight.shadowMapWidth = 2048;
-            this.spotLight.shadowMapHeight = 2048;
-            this.spotLight.shadowDarkness = 0.5;
-            this.spotLight.name = "Spot Light";
-            this.add(this.spotLight);
-            console.log("Added spotLight to scene");
+        private addDirectionalLight(): void {
+            // Directional Light
+            this.directionLight = new DirectionalLight(0xffffff, 1.2);
+            this.directionLight.position.set(5, 40, 20);
+            this.directionLight.castShadow = true;
+            this.directionLight.lookAt(new Vector3(0, 0, 0));
+            this.directionLight.shadowCameraNear = 2;
+            this.directionLight.shadowCameraFar = 200;
+            this.directionLight.shadowCameraLeft = -5;
+            this.directionLight.shadowCameraRight = 5;
+            this.directionLight.shadowCameraTop = 5;
+            this.directionLight.shadowCameraBottom = -5;
+            this.directionLight.shadowMapWidth = 2048;
+            this.directionLight.shadowMapHeight = 2048;
+            this.directionLight.shadowDarkness = 0.5;
+            this.directionLight.name = "Directional Light";
+            this.add(this.directionLight);
+            console.log("Added directional light to scene");
+        }
+        
+        /**
+         * Add an ambient light to the scene
+         * 
+         * @method addAmbientLight
+         * @return void
+         */
+        private addAmbientLight(): void{
+            // Ambient Light
+            this.ambientLight = new AmbientLight(0x303030);
+            this.add(this.ambientLight);
+            console.log("Added an Ambient Light to Scene");
         }
 
         /**
@@ -169,7 +182,7 @@ module scenes {
          * @return void
          */
         private addGround(): void {
-            this.groundTexture = new THREE.TextureLoader().load('../../Assets/images/GravelCobble.jpg');
+            /*this.groundTexture = new THREE.TextureLoader().load('../../Assets/images/GravelCobble.jpg');
             this.groundTexture.wrapS = THREE.RepeatWrapping;
             this.groundTexture.wrapT = THREE.RepeatWrapping;
             this.groundTexture.repeat.set(8, 8);
@@ -177,18 +190,19 @@ module scenes {
             this.groundTextureNormal = new THREE.TextureLoader().load('../../Assets/images/GravelCobbleNormal.png');
             this.groundTextureNormal.wrapS = THREE.RepeatWrapping;
             this.groundTextureNormal.wrapT = THREE.RepeatWrapping;
-            this.groundTextureNormal.repeat.set(8, 8);
+            this.groundTextureNormal.repeat.set(8, 8);*/
 
-            this.groundMaterial = new PhongMaterial();
-            this.groundMaterial.map = this.groundTexture;
+            this.groundMaterial = new PhongMaterial({ color: 0x00FF00 });
+            /*this.groundMaterial.map = this.groundTexture;
             this.groundMaterial.bumpMap = this.groundTextureNormal;
-            this.groundMaterial.bumpScale = 0.2;
+            this.groundMaterial.bumpScale = 0.2;*/
 
-            this.groundGeometry = new BoxGeometry(32, 1, 32);
+            this.groundGeometry = new BoxGeometry(128, 1, 128);
             this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0, 0);
             this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
             this.ground.receiveShadow = true;
             this.ground.name = "Ground";
+            this.ground.position.set(0, -0.5, 0);
             this.add(this.ground);
             console.log("Added Burnt Ground to scene");
         }
@@ -205,7 +219,7 @@ module scenes {
             this.playerMaterial = Physijs.createMaterial(new LambertMaterial({ color: 0x00ff00 }), 0.4, 0);
 
             this.player = new Physijs.BoxMesh(this.playerGeometry, this.playerMaterial, 1);
-            this.player.position.set(0, 30, 10);
+            this.player.position.set(0, 2, 10);
             this.player.receiveShadow = true;
             this.player.castShadow = true;
             this.player.name = "Player";
@@ -231,7 +245,19 @@ module scenes {
         
        
         private generateLevel():void{
-            this.creator.createCube(1,1,1,1,0,this);
+            //this.creator.createCube(1, 1 , 1, 0, this);
+            
+            // Set Positions
+            var cubetangle1Pos = new Vector3(0, 0, 0);
+            var cubetangle2Pos = new Vector3(0, 0, -5);
+            var cubetangle3Pos = new Vector3(0, 0, -15);
+            var cubetangle4Pos = new Vector3(0, 0, -30);
+            
+            // Instantiate Cubetangles
+            this.creator.createCubetangle(1, 1, 1, cubetangle1Pos, this);
+            this.creator.createCubetangle(2, 2, 2, cubetangle2Pos, this);
+            this.creator.createCubetangle(3, 3, 3, cubetangle3Pos, this);
+            this.creator.createCubetangle(4, 4, 4, cubetangle4Pos, this);
         }
         
 
@@ -428,9 +454,13 @@ module scenes {
             this.addEventListener('update', () => {
                 this.simulate(undefined, 2);
             });
-
-            // Add Spot Light to the scene
-            this.addSpotLight();
+            
+            // Add Ambient Light to the scene
+            this.addAmbientLight();
+            
+            
+            // Add Directional Light to the scene
+            this.addDirectionalLight();
 
             // Ground Object
             this.addGround();
@@ -439,7 +469,7 @@ module scenes {
             this.addPlayer();
 
             // Add custom coin imported from Blender
-            this.addCoinMesh();
+            //this.addCoinMesh();
 
             // Add death plane to the scene
             this.addDeathPlane();
@@ -473,6 +503,8 @@ module scenes {
             // create parent-child relationship with camera and player
             this.player.add(camera);
             camera.position.set(0, 1, 0);
+            
+            this.generateLevel();
 
             this.simulate();
         }
@@ -498,11 +530,11 @@ module scenes {
          * @returns void
          */
         public update(): void {
-
+            /*
             this.coins.forEach(coin => {
                 coin.setAngularFactor(new Vector3(0, 0, 0));
                 coin.setAngularVelocity(new Vector3(0, 1, 0));
-            });
+            });*/
 
             this.checkControls();
             this.stage.update();
