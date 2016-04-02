@@ -190,11 +190,20 @@ var scenes;
             var cubetangle2Pos = new Vector3(0, 0, -5);
             var cubetangle3Pos = new Vector3(0, 0, -15);
             var cubetangle4Pos = new Vector3(0, 0, -30);
+            var cubeamid1Pos = new Vector3(-20, 0, 0);
+            var cubeamid2Pos = new Vector3(-20, 0, -5);
+            var cubeamid3Pos = new Vector3(-20, 0, -15);
+            var cubeamid4Pos = new Vector3(-20, 0, -30);
             // Instantiate Cubetangles
             this.creator.createCubetangle(1, 1, 1, cubetangle1Pos, this);
             this.creator.createCubetangle(2, 2, 2, cubetangle2Pos, this);
             this.creator.createCubetangle(3, 3, 3, cubetangle3Pos, this);
             this.creator.createCubetangle(4, 4, 4, cubetangle4Pos, this);
+            // Instantiate Cubeamids
+            this.creator.createCubeamid(2, cubeamid1Pos, this);
+            this.creator.createCubeamid(3, cubeamid2Pos, this);
+            this.creator.createCubeamid(4, cubeamid3Pos, this);
+            this.creator.createCubeamid(5, cubeamid4Pos, this);
         };
         /**
          * This method adds a coin to the scene

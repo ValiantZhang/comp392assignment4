@@ -64,6 +64,18 @@ var builder;
                 }
             }
         };
+        /**
+         * Add a cubeamid object H in cubes
+         *
+         * @method createCubeamid
+         * @return void
+         */
+        Creator.prototype.createCubeamid = function (heightY, origin, attachTo) {
+            // Loop through and create cubeamid with specifed # of cubes
+            for (var h = 0; h < heightY; h++) {
+                this.createCubetangle((heightY - h), 1, (heightY - h), origin.add(new Vector3(0, 1, 0)), attachTo);
+            }
+        };
         return Creator;
     }());
     builder.Creator = Creator;
