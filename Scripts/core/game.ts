@@ -145,7 +145,7 @@ function setupRenderer(): void {
 // Setup main camera for the scene
 function setupCamera(): void {
     camera = new PerspectiveCamera(35, config.Screen.RATIO, 0.1, 100);
-    //camera.position.set(0, 10, 30);
+    //camera.position.set(0, 40, 30);
     //camera.lookAt(new Vector3(0, 0, 0));
     console.log("Finished setting up Camera...");
 }

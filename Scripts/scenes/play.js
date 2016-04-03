@@ -166,8 +166,8 @@ var scenes;
             this.player.receiveShadow = true;
             this.player.castShadow = true;
             this.player.name = "Player";
-            this.add(this.player);
-            console.log("Added Player to Scene");
+            //this.add(this.player);
+            //console.log("Added Player to Scene");
         };
         /**
          * Add the death plane to the scene
@@ -175,13 +175,66 @@ var scenes;
          * @method addDeathPlane
          * @return void
          */
-        Play.prototype.addDeathPlane = function () {
+        /*private addDeathPlane(): void {
             this.deathPlaneGeometry = new BoxGeometry(100, 1, 100);
             this.deathPlaneMaterial = Physijs.createMaterial(new MeshBasicMaterial({ color: 0xff0000 }), 0.4, 0.6);
+
             this.deathPlane = new Physijs.BoxMesh(this.deathPlaneGeometry, this.deathPlaneMaterial, 0);
             this.deathPlane.position.set(0, -10, 0);
             this.deathPlane.name = "DeathPlane";
             this.add(this.deathPlane);
+        }*/
+        /**
+         * Adds the reticle to the camera
+         *
+         * @method addReticle
+         * @return void
+         */
+        Play.prototype.addReticle = function () {
+            //Reticle Object
+            this.reticleTexture = new THREE.TextureLoader().load('../../Assets/images/reticleTexture.png');
+            this.reticleTexture.wrapS = THREE.RepeatWrapping;
+            this.reticleTexture.wrapT = THREE.RepeatWrapping;
+            this.reticleTexture.repeat.set(1, 1);
+            this.reticleGeometry = new PlaneGeometry(0.02, 0.02);
+            this.reticleMaterial = new PhongMaterial({ emissive: 0xFFFFFF });
+            this.reticleMaterial.map = this.reticleTexture;
+            this.reticleMaterial.transparent = true;
+            this.reticleMaterial.opacity = 1;
+            this.reticle = new Mesh(this.reticleGeometry, this.reticleMaterial);
+            this.reticle.name = "Reticle";
+            camera.add(this.reticle);
+            this.reticle.position.set(0, 0.01, -0.2);
+        };
+        /**
+         * Adds the chargeBar to the camera
+         *
+         * @method addChargeBar
+         * @return void
+         */
+        Play.prototype.addChargeBar = function () {
+            //ChargeBar Object
+            this.chargePower = 1.0;
+            this.chargeBarGeometry = new PlaneGeometry(0.03, 0.015);
+            this.chargeBar = [];
+            this.chargeBarMaterials = [];
+            this.chargeBarTextures = [];
+            for (var i = 0; i < 13; i++) {
+                this.chargeBarTextures[i] = new THREE.TextureLoader().load('../../Assets/images/charge-bar/charge-bar-' + i + '.png');
+                this.chargeBarTextures[i].wrapS = THREE.RepeatWrapping;
+                this.chargeBarTextures[i].wrapT = THREE.RepeatWrapping;
+                this.chargeBarTextures[i].repeat.set(1, 1);
+                this.chargeBarMaterials[i] = new PhongMaterial({ emissive: 0xFFFFFF });
+                this.chargeBarMaterials[i].map = this.chargeBarTextures[i];
+                this.chargeBarMaterials[i].transparent = true;
+                this.chargeBarMaterials[i].opacity = 0;
+                this.chargeBar[i] = new Mesh(this.chargeBarGeometry, this.chargeBarMaterials[i]);
+                this.chargeBar[i].name = "ChargeBar-" + i;
+                camera.add(this.chargeBar[i]);
+                this.chargeBar[i].position.set(0, -0.042, -0.2);
+            }
+            this.chargeBarMaterials[0].opacity = 1;
+            this.chargeBarMaterials[1].opacity = 1;
         };
         Play.prototype.generateLevel = function () {
             //this.creator.createCube(1, 1 , 1, 0, this);
@@ -274,6 +327,26 @@ var scenes;
             this.instructions.style.display = '';
             console.log("PointerLock Error Detected!!");
         };
+        /**
+         * This method checks the charge level and shows the appropriate textures
+         *
+         * @method checkCharge
+         * @return void
+         */
+        Play.prototype.checkCharge = function () {
+            if (this.chargePower > 12) {
+                this.chargePower = 12;
+            }
+            ;
+            for (var i = 2; i < this.chargeBar.length; i++) {
+                if (this.chargePower >= i) {
+                    this.chargeBarMaterials[i].opacity = 1;
+                }
+                else {
+                    this.chargeBarMaterials[i].opacity = 0;
+                }
+            }
+        };
         // Check Controls Function
         /**
          * This method updates the player's position based on user input
@@ -283,10 +356,18 @@ var scenes;
          */
         Play.prototype.checkControls = function () {
             if (this.keyboardControls.enabled) {
-                this.velocity = new Vector3();
+                //this.velocity = new Vector3();
                 var time = performance.now();
                 var delta = (time - this.prevTime) / 1000;
-                if (this.isGrounded) {
+                //ChargeBar
+                if (this.keyboardControls.charge) {
+                    this.chargePower += 3 * delta;
+                }
+                else {
+                    this.chargePower = 1;
+                }
+                this.checkCharge();
+                /*if (this.isGrounded) {
                     var direction = new Vector3(0, 0, 0);
                     if (this.keyboardControls.moveForward) {
                         this.velocity.z -= 400.0 * delta;
@@ -306,7 +387,9 @@ var scenes;
                             this.isGrounded = false;
                             createjs.Sound.play("jump");
                         }
+
                     }
+
                     this.player.setDamping(0.7, 0.1);
                     // Changing player's rotation
                     this.player.setAngularVelocity(new Vector3(0, this.mouseControls.yaw, 0));
@@ -314,17 +397,18 @@ var scenes;
                     direction.applyQuaternion(this.player.quaternion);
                     if (Math.abs(this.player.getLinearVelocity().x) < 20 && Math.abs(this.player.getLinearVelocity().y) < 10) {
                         this.player.applyCentralForce(direction);
-                    }
-                    this.cameraLook();
-                } // isGrounded ends
-                //reset Pitch and Yaw
-                this.mouseControls.pitch = 0;
-                this.mouseControls.yaw = 0;
-                this.prevTime = time;
-            } // Controls Enabled ends
-            else {
+                    }*/
+                this.cameraLook();
+            } // isGrounded ends
+            //reset Pitch and Yaw
+            this.mouseControls.pitch = 0;
+            this.mouseControls.yaw = 0;
+            this.prevTime = time;
+            //} 
+            // Controls Enabled ends
+            /*else {
                 this.player.setAngularVelocity(new Vector3(0, 0, 0));
-            }
+            }*/
         };
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
         /**
@@ -377,7 +461,7 @@ var scenes;
             // Add custom coin imported from Blender
             //this.addCoinMesh();
             // Add death plane to the scene
-            this.addDeathPlane();
+            //this.addDeathPlane();
             // Collision Check
             this.player.addEventListener('collision', function (eventObject) {
                 if (eventObject.name === "Ground") {
@@ -401,8 +485,11 @@ var scenes;
                 }
             }.bind(this));
             // create parent-child relationship with camera and player
-            this.player.add(camera);
-            camera.position.set(0, 1, 0);
+            this.add(camera);
+            camera.position.set(0, 5, 30);
+            // Add UI Elements
+            this.addReticle();
+            this.addChargeBar();
             this.generateLevel();
             this.simulate();
         };
@@ -413,11 +500,13 @@ var scenes;
          * @return void
          */
         Play.prototype.cameraLook = function () {
-            var zenith = THREE.Math.degToRad(90);
-            var nadir = THREE.Math.degToRad(-90);
+            var zenith = THREE.Math.degToRad(25);
+            var nadir = THREE.Math.degToRad(-25);
             var cameraPitch = camera.rotation.x + this.mouseControls.pitch;
-            // Constrain the Camera Pitch
+            var cameraYaw = camera.rotation.y + this.mouseControls.yaw;
+            // Constrain the Camera Pitch & Yaw
             camera.rotation.x = THREE.Math.clamp(cameraPitch, nadir, zenith);
+            camera.rotation.y = THREE.Math.clamp(cameraYaw, nadir, zenith);
         };
         /**
          * @method update

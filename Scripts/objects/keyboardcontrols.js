@@ -28,7 +28,7 @@ var objects;
                     this.moveRight = true;
                     break;
                 case 32:
-                    this.jump = true;
+                    this.charge = true;
                     break;
             }
         };
@@ -51,7 +51,7 @@ var objects;
                     this.moveRight = false;
                     break;
                 case 32:
-                    this.jump = false;
+                    this.charge = false;
                     break;
             }
         };

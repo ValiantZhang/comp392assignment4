@@ -24,6 +24,10 @@ module scenes {
         private ground: Physijs.Mesh;
         private groundTexture: Texture;
         private groundTextureNormal: Texture;
+        private reticleGeometry: PlaneGeometry;
+        private reticleMaterial: PhongMaterial;
+        private reticleTexture: Texture;
+        private reticle: Mesh;
         private playerGeometry: CubeGeometry;
         private playerMaterial: Physijs.Material;
         private player: Physijs.Mesh;
@@ -37,6 +41,13 @@ module scenes {
         private deathPlaneGeometry: CubeGeometry;
         private deathPlaneMaterial: Physijs.Material;
         private deathPlane: Physijs.Mesh;
+        
+        //Charge Bar
+        private chargeBar: Mesh[];
+        private chargeBarGeometry: PlaneGeometry;
+        private chargeBarMaterials: PhongMaterial[];
+        private chargeBarTextures: Texture[];
+        private chargePower: number;
 
         private velocity: Vector3;
         private prevTime: number;
@@ -223,8 +234,8 @@ module scenes {
             this.player.receiveShadow = true;
             this.player.castShadow = true;
             this.player.name = "Player";
-            this.add(this.player);
-            console.log("Added Player to Scene");
+            //this.add(this.player);
+            //console.log("Added Player to Scene");
         }
 
         /**
@@ -233,7 +244,7 @@ module scenes {
          * @method addDeathPlane
          * @return void
          */
-        private addDeathPlane(): void {
+        /*private addDeathPlane(): void {
             this.deathPlaneGeometry = new BoxGeometry(100, 1, 100);
             this.deathPlaneMaterial = Physijs.createMaterial(new MeshBasicMaterial({ color: 0xff0000 }), 0.4, 0.6);
 
@@ -241,8 +252,65 @@ module scenes {
             this.deathPlane.position.set(0, -10, 0);
             this.deathPlane.name = "DeathPlane";
             this.add(this.deathPlane);
+        }*/
+        
+        /**
+         * Adds the reticle to the camera
+         * 
+         * @method addReticle
+         * @return void
+         */
+        private addReticle(): void {
+            //Reticle Object
+            this.reticleTexture = new THREE.TextureLoader().load('../../Assets/images/reticleTexture.png');
+            this.reticleTexture.wrapS = THREE.RepeatWrapping;
+            this.reticleTexture.wrapT = THREE.RepeatWrapping;
+            this.reticleTexture.repeat.set(1, 1);
+            
+            this.reticleGeometry = new PlaneGeometry(0.02, 0.02);
+            this.reticleMaterial = new PhongMaterial({emissive: 0xFFFFFF});
+            this.reticleMaterial.map = this.reticleTexture;
+            this.reticleMaterial.transparent = true;
+            this.reticleMaterial.opacity = 1;
+            this.reticle = new Mesh(this.reticleGeometry, this.reticleMaterial);
+            this.reticle.name = "Reticle";
+            camera.add(this.reticle);
+            this.reticle.position.set(0, 0.01, -0.2);
         }
         
+        /**
+         * Adds the chargeBar to the camera
+         * 
+         * @method addChargeBar
+         * @return void
+         */
+        private addChargeBar(): void {
+            //ChargeBar Object
+            this.chargePower = 1.0;
+            this.chargeBarGeometry = new PlaneGeometry(0.03, 0.015);
+            this.chargeBar = [];
+            this.chargeBarMaterials = [];
+            this.chargeBarTextures = [];
+            
+            for (var i = 0; i < 13; i++){
+                this.chargeBarTextures[i] = new THREE.TextureLoader().load('../../Assets/images/charge-bar/charge-bar-' + i + '.png');
+                this.chargeBarTextures[i].wrapS = THREE.RepeatWrapping;
+                this.chargeBarTextures[i].wrapT = THREE.RepeatWrapping;
+                this.chargeBarTextures[i].repeat.set(1, 1);
+
+                this.chargeBarMaterials[i] = new PhongMaterial({emissive: 0xFFFFFF});
+                this.chargeBarMaterials[i].map = this.chargeBarTextures[i];
+                this.chargeBarMaterials[i].transparent = true;
+                this.chargeBarMaterials[i].opacity = 0;
+                this.chargeBar[i] = new Mesh(this.chargeBarGeometry, this.chargeBarMaterials[i]);
+                this.chargeBar[i].name = "ChargeBar-" + i;
+                camera.add(this.chargeBar[i]);
+                this.chargeBar[i].position.set(0, -0.042, -0.2);
+            }
+            
+            this.chargeBarMaterials[0].opacity = 1;
+            this.chargeBarMaterials[1].opacity = 1;
+        }
        
         private generateLevel():void{
             //this.creator.createCube(1, 1 , 1, 0, this);
@@ -349,6 +417,25 @@ module scenes {
             console.log("PointerLock Error Detected!!");
         }
 
+        /**
+         * This method checks the charge level and shows the appropriate textures
+         * 
+         * @method checkCharge
+         * @return void
+         */
+         private checkCharge(): void{
+             if (this.chargePower > 12) { this.chargePower = 12 };
+             
+             for (var i = 2; i < this.chargeBar.length; i++){
+                 if (this.chargePower >= i) {
+                     this.chargeBarMaterials[i].opacity = 1;
+                 }
+                 else {
+                     this.chargeBarMaterials[i].opacity = 0;
+                 }
+             }
+         }
+
         // Check Controls Function
 
         /**
@@ -359,12 +446,22 @@ module scenes {
          */
         private checkControls(): void {
             if (this.keyboardControls.enabled) {
-                this.velocity = new Vector3();
+                
+                //this.velocity = new Vector3();
 
                 var time: number = performance.now();
                 var delta: number = (time - this.prevTime) / 1000;
+                
+                                //ChargeBar
+                if (this.keyboardControls.charge){
+                    this.chargePower += 3 * delta;
+                }
+                else {
+                    this.chargePower = 1;
+                }
+                this.checkCharge();
 
-                if (this.isGrounded) {
+                /*if (this.isGrounded) {
                     var direction = new Vector3(0, 0, 0);
                     if (this.keyboardControls.moveForward) {
                         this.velocity.z -= 400.0 * delta;
@@ -394,7 +491,7 @@ module scenes {
                     direction.applyQuaternion(this.player.quaternion);
                     if (Math.abs(this.player.getLinearVelocity().x) < 20 && Math.abs(this.player.getLinearVelocity().y) < 10) {
                         this.player.applyCentralForce(direction);
-                    }
+                    }*/
 
                     this.cameraLook();
 
@@ -405,10 +502,11 @@ module scenes {
                 this.mouseControls.yaw = 0;
 
                 this.prevTime = time;
-            } // Controls Enabled ends
-            else {
+            //} 
+            // Controls Enabled ends
+            /*else {
                 this.player.setAngularVelocity(new Vector3(0, 0, 0));
-            }
+            }*/
         }
 
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
@@ -482,7 +580,7 @@ module scenes {
             //this.addCoinMesh();
 
             // Add death plane to the scene
-            this.addDeathPlane();
+            //this.addDeathPlane();
 
             // Collision Check
 
@@ -511,8 +609,13 @@ module scenes {
             }.bind(this));
 
             // create parent-child relationship with camera and player
-            this.player.add(camera);
-            camera.position.set(0, 1, 0);
+            this.add(camera);
+            camera.position.set(0, 5, 30);
+            
+            // Add UI Elements
+            this.addReticle();
+            this.addChargeBar();
+            
             
             this.generateLevel();
 
@@ -526,13 +629,15 @@ module scenes {
          * @return void
          */
         private cameraLook(): void {
-            var zenith: number = THREE.Math.degToRad(90);
-            var nadir: number = THREE.Math.degToRad(-90);
+            var zenith: number = THREE.Math.degToRad(25);
+            var nadir: number = THREE.Math.degToRad(-25);
 
             var cameraPitch: number = camera.rotation.x + this.mouseControls.pitch;
+            var cameraYaw: number = camera.rotation.y + this.mouseControls.yaw;
 
-            // Constrain the Camera Pitch
+            // Constrain the Camera Pitch & Yaw
             camera.rotation.x = THREE.Math.clamp(cameraPitch, nadir, zenith);
+            camera.rotation.y = THREE.Math.clamp(cameraYaw, nadir, zenith);
         }
 
         /**

@@ -78,12 +78,12 @@ module builder {
          * @return void
          */
         public createCubeamid(heightY:number, origin:Vector3, attachTo: THREE.Object3D){
+            // Normalize the level of the first origin
+            origin.add(new Vector3(0, -1, 0));
             // Loop through and create cubeamid with specifed # of cubes
             for (var h = 0; h < heightY; h++){
                 this.createCubetangle((heightY - h), 1, (heightY - h), origin.add(new Vector3(0, 1, 0)), attachTo);
             }
         }
-        
-        
     }
 }
