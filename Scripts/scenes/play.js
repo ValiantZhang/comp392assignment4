@@ -300,7 +300,9 @@ var scenes;
          * @return void
          */
         Play.prototype.pointerLockChange = function (event) {
-            if (document.pointerLockElement === this.element) {
+            if (document.pointerLockElement === this.element ||
+                document.mozPointerLockElement === this.element ||
+                document.webkitPointerLockElement === this.element) {
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
