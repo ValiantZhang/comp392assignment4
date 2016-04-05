@@ -32,6 +32,9 @@ var Clock = THREE.Clock;
 Physijs.scripts.worker = "/Scripts/lib/Physijs/physijs_worker.js";
 Physijs.scripts.ammo = "/Scripts/lib/Physijs/examples/js/ammo.js";
 // Game Variables
+var scoreValue;
+var shotsValue;
+var highScoreValue = 0;
 var scene;
 var currentScene;
 var renderer;
@@ -141,11 +144,9 @@ function changeScene() {
             break;
         case config.Scene.OVER:
             // show the game OVER scene
-            /*
             over = new scenes.Over();
             scene = over;
             console.log("Starting OVER Scene");
-            */
             break;
     }
 }

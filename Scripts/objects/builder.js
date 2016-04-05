@@ -18,7 +18,7 @@ var builder;
         }
         // PUBLIC METHODS
         /**
-        * Add the cube type 0 - standart, 1 - golden
+        * Add the cube type 0 - standard, 1 - golden
         *
         * @method createCube
         * @return void
@@ -30,12 +30,12 @@ var builder;
             var basicCubeMaterial;
             //standard
             if (type == 0) {
-                basicCubeMaterial = new LambertMaterial({ color: 0xFFffFF });
+                basicCubeMaterial = new LambertMaterial({ color: 0xFFFFFF });
                 cubeName = "standard";
             }
             //golden
             if (type == 1) {
-                basicCubeMaterial = new LambertMaterial({ color: 0xFACEee });
+                basicCubeMaterial = new LambertMaterial({ color: 0xFFD81C });
                 cubeName = "golden";
             }
             var cubePhysMaterial = Physijs.createMaterial(basicCubeMaterial, 0.1, 0.1);
@@ -77,6 +77,37 @@ var builder;
             for (var h = 0; h < heightY; h++) {
                 this.createCubetangle((heightY - h), 1, (heightY - h), origin.add(new Vector3(0, 1, 0)), attachTo);
             }
+        };
+        /**
+         * Create a sphere to use as a projectile
+         *
+         * @method createProjectile
+         * @return void
+         */
+        Creator.prototype.createProjectile = function (posX, posY, posZ, radius, width, height, attachTo, launchPower, launchAngle, launchYaw) {
+            if (radius === void 0) { radius = 1; }
+            if (width === void 0) { width = 8; }
+            if (height === void 0) { height = 8; }
+            if (launchPower === void 0) { launchPower = 1; }
+            if (launchAngle === void 0) { launchAngle = 1; }
+            if (launchYaw === void 0) { launchYaw = 1; }
+            var projectileGeometry = new SphereGeometry(radius, width, height);
+            var projectileName = "Shot";
+            var basicProjectileMaterial = new LambertMaterial({ color: 0x000000 });
+            var projectilePhysMaterial = Physijs.createMaterial(basicProjectileMaterial, 0.1, 0.1);
+            var rogueSphere = new Physijs.BoxMesh(projectileGeometry, projectilePhysMaterial, 1);
+            rogueSphere.position.set(posX, posY, posZ);
+            rogueSphere.name = projectileName;
+            attachTo.add(rogueSphere);
+            rogueSphere.applyCentralForce(new Vector3(launchYaw, launchAngle, -launchPower));
+            rogueSphere.addEventListener('collision', function (object) {
+                if (object.name === "standard") {
+                    scoreValue += 100;
+                }
+                if (object.name === "golden") {
+                    scoreValue += 2500;
+                }
+            });
         };
         return Creator;
     }());

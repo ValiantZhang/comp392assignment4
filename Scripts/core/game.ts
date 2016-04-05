@@ -36,6 +36,10 @@ Physijs.scripts.worker = "/Scripts/lib/Physijs/physijs_worker.js";
 Physijs.scripts.ammo = "/Scripts/lib/Physijs/examples/js/ammo.js";
 
 // Game Variables
+var scoreValue: number;
+var shotsValue: number;
+var highScoreValue: number = 0;
+
 var scene: scenes.Scene;
 var currentScene: number;
 var renderer: Renderer;
@@ -44,6 +48,8 @@ var camera: PerspectiveCamera;
 var play: scenes.Play;
 var menu: scenes.Menu;
 var over: scenes.Over;
+
+
 
 var stats: Stats;
 var canvas: HTMLElement;
@@ -167,14 +173,13 @@ function changeScene(): void {
             break;
         case config.Scene.OVER:
             // show the game OVER scene
-            /*
             over = new scenes.Over();
             scene = over;
             console.log("Starting OVER Scene");
-            */
             break;
     }
 }
+
 
 window.onload = preload;
 

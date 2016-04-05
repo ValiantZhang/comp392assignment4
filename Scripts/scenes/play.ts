@@ -29,8 +29,8 @@ module scenes {
         private reticleTexture: Texture;
         private reticle: Mesh;
         private playerGeometry: CubeGeometry;
-        private playerMaterial: Physijs.Material;
-        private player: Physijs.Mesh;
+        private playerMaterial: Material;
+        private player: Mesh;
         private keyboardControls: objects.KeyboardControls;
         private mouseControls: objects.MouseControls;
         private isGrounded: boolean;
@@ -48,6 +48,10 @@ module scenes {
         private chargeBarMaterials: PhongMaterial[];
         private chargeBarTextures: Texture[];
         private chargePower: number;
+        
+        private directionLineMaterial: LineBasicMaterial;
+        private directionLineGeometry: Geometry;
+        private directionLine: Line;
 
         private velocity: Vector3;
         private prevTime: number;
@@ -55,9 +59,9 @@ module scenes {
 
         private stage: createjs.Stage;
         private scoreLabel: createjs.Text;
-        private livesLabel: createjs.Text;
-        private scoreValue: number;
-        private livesValue: number;
+        private shotsLabel: createjs.Text;
+        //public scoreValue: number;
+        //private shotsValue: number;
         private creator :builder.Creator = new builder.Creator();
 
         
@@ -105,8 +109,8 @@ module scenes {
             this.prevTime = 0;
             this.stage = new createjs.Stage(canvas);
             this.velocity = new Vector3(0, 0, 0);
-
-            // setup a THREE.JS Clock object
+            
+            // setup a THREE.JS Clock objectg
             this.clock = new Clock();
 
             // Instantiate Game Controls
@@ -120,24 +124,24 @@ module scenes {
          * @returns void
          */
         private setupScoreboard(): void {
-            // initialize  score and lives values
-            this.scoreValue = 0;
-            this.livesValue = 5;
+            // initialize  score and shots values
+            scoreValue = 0;
+            shotsValue = 5;
 
-            // Add Lives Label
-            this.livesLabel = new createjs.Text(
-                "LIVES: " + this.livesValue,
+            // Add shots Label
+            this.shotsLabel = new createjs.Text(
+                "Shots: " + shotsValue,
                 "40px Consolas",
                 "#ffffff"
             );
-            this.livesLabel.x = config.Screen.WIDTH * 0.1;
-            this.livesLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
-            this.stage.addChild(this.livesLabel);
-            console.log("Added Lives Label to stage");
+            this.shotsLabel.x = config.Screen.WIDTH * 0.1;
+            this.shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(this.shotsLabel);
+            console.log("Added shots Label to stage");
 
             // Add Score Label
             this.scoreLabel = new createjs.Text(
-                "SCORE: " + this.scoreValue,
+                "Score: " + scoreValue,
                 "40px Consolas",
                 "#ffffff"
             );
@@ -209,7 +213,7 @@ module scenes {
             this.groundMaterial.bumpScale = 0.2;*/
 
             this.groundGeometry = new BoxGeometry(128, 1, 128);
-            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0, 0);
+            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 1, 0);
             this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
             this.ground.receiveShadow = true;
             this.ground.name = "Ground";
@@ -225,16 +229,28 @@ module scenes {
          * @return void
          */
         private addPlayer(): void {
+            
+            
+            
             // Player Object
             this.playerGeometry = new BoxGeometry(2, 4, 2);
-            this.playerMaterial = Physijs.createMaterial(new LambertMaterial({ color: 0x00ff00 }), 0.4, 0);
+            this.playerMaterial = new LambertMaterial({ color: 0x00ff00 });
 
-            this.player = new Physijs.BoxMesh(this.playerGeometry, this.playerMaterial, 1);
-            this.player.position.set(0, 2, 10);
+            this.player = new THREE.Mesh(this.playerGeometry, this.playerMaterial);
+            this.player.position.set(0, 0, 0);
             this.player.receiveShadow = true;
             this.player.castShadow = true;
             this.player.name = "Player";
-            //this.add(this.player);
+            this.add(this.player);
+            
+            this.directionLineMaterial = new LineBasicMaterial({ color: 0xBadBad });
+            this.directionLineGeometry = new Geometry();
+            this.directionLineGeometry.vertices.push(new Vector3(0, 0, 0)); // line origin
+            this.directionLineGeometry.vertices.push(new Vector3(0, 0, -50)); // end of the line
+            this.directionLine = new Line(this.directionLineGeometry, this.directionLineMaterial);
+            this.player.add(this.directionLine);
+            console.log("Added DirectionLine to the Player");
+            
             //console.log("Added Player to Scene");
         }
 
@@ -313,29 +329,28 @@ module scenes {
         }
        
         private generateLevel():void{
-            //this.creator.createCube(1, 1 , 1, 0, this);
+            //Create Golden Cubes
+            this.creator.createCube(-5.5, 6.5, -15.5, 1, this);
+            this.creator.createCube(-0.5, 6.5, -15.5, 1, this);
+            this.creator.createCube(4.5, 6.5, -15.5, 1, this);
             
             // Set Positions
-            var cubetangle1Pos = new Vector3(0, 0, 0);
-            var cubetangle2Pos = new Vector3(0, 0, -5);
-            var cubetangle3Pos = new Vector3(0, 0, -15);
-            var cubetangle4Pos = new Vector3(0, 0, -30);
-            var cubeamid1Pos = new Vector3(-20, 0, 0);
-            var cubeamid2Pos = new Vector3(-20, 0, -5);
-            var cubeamid3Pos = new Vector3(-20, 0, -15);
-            var cubeamid4Pos = new Vector3(-20, 0, -30);
+            var cubetangle1Pos = new Vector3(-5, 0, -15);
+            var cubetangle2Pos = new Vector3(0, 0, -15);
+            var cubetangle3Pos = new Vector3(5, 0, -15);
+            var cubeamid1Pos = new Vector3(-5, 3, -15);
+            var cubeamid2Pos = new Vector3(0, 3, -15);
+            var cubeamid3Pos = new Vector3(5, 3, -15);
             
             // Instantiate Cubetangles
-            this.creator.createCubetangle(1, 1, 1, cubetangle1Pos, this);
-            this.creator.createCubetangle(2, 2, 2, cubetangle2Pos, this);
+            this.creator.createCubetangle(3, 3, 3, cubetangle1Pos, this);
+            this.creator.createCubetangle(3, 3, 3, cubetangle2Pos, this);
             this.creator.createCubetangle(3, 3, 3, cubetangle3Pos, this);
-            this.creator.createCubetangle(4, 4, 4, cubetangle4Pos, this);
             
             // Instantiate Cubeamids
-            this.creator.createCubeamid(2, cubeamid1Pos, this);
+            this.creator.createCubeamid(3, cubeamid1Pos, this);
             this.creator.createCubeamid(3, cubeamid2Pos, this);
-            this.creator.createCubeamid(4, cubeamid3Pos, this);
-            this.creator.createCubeamid(5, cubeamid4Pos, this);
+            this.creator.createCubeamid(3, cubeamid3Pos, this);
         }
         
 
@@ -389,21 +404,31 @@ module scenes {
          * @return void
          */
         pointerLockChange(event): void {
-            if (document.pointerLockElement === this.element ||
+            if (document.pointerLockElement === this.element/* ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element){
+                document.webkitPointerLockElement === this.element*/){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
                 this.blocker.style.display = 'none';
             } else {
                 // disable our mouse and keyboard controls
-                this.keyboardControls.enabled = false;
-                this.mouseControls.enabled = false;
+                if (shotsValue <= 0) {
+                    this.blocker.style.display = 'none';
+                    document.removeEventListener('pointerlockchange', this.pointerLockChange.bind(this), false);
+                    document.removeEventListener('mozpointerlockchange', this.pointerLockChange.bind(this), false);
+                    document.removeEventListener('webkitpointerlockchange', this.pointerLockChange.bind(this), false);
+                    document.removeEventListener('pointerlockerror', this.pointerLockError.bind(this), false);
+                    document.removeEventListener('mozpointerlockerror', this.pointerLockError.bind(this), false);
+                    document.removeEventListener('webkitpointerlockerror', this.pointerLockError.bind(this), false);
+                } else {
                 this.blocker.style.display = '-webkit-box';
                 this.blocker.style.display = '-moz-box';
                 this.blocker.style.display = 'box';
                 this.instructions.style.display = '';
+                }
+                this.keyboardControls.enabled = false;
+                this.mouseControls.enabled = false;
                 console.log("PointerLock disabled");
             }
         }
@@ -437,6 +462,22 @@ module scenes {
                  }
              }
          }
+         
+         /**
+         * This method creates and launches a sphere projectile
+         * 
+         * Projectile is create at player position
+         * 
+         * @method launchSphere
+         * @return void
+         */
+         private launchSphere(launchPower: number, launchAngle: number, launchYaw: number): void{
+             if (shotsValue > 0){
+                this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z, 
+                1, 5, 5, this, launchPower, launchAngle, launchYaw);
+             }
+             console.log(launchPower + launchAngle + launchYaw);
+         }
 
         // Check Controls Function
 
@@ -459,7 +500,23 @@ module scenes {
                     this.chargePower += 3 * delta;
                 }
                 else {
-                    this.chargePower = 1;
+                    if (this.chargePower > 1){
+                    this.launchSphere(this.chargePower * 5000 * delta, camera.rotation.x, camera.rotation.y);
+                    shotsValue--;
+                    this.shotsLabel.text = "Shots: " + shotsValue;
+                     if (shotsValue <= 0) {
+                        // Exit Pointer Lock
+                        document.exitPointerLock();
+                        this.children = []; // an attempt to clean up
+                        this.player.remove(camera);
+
+                        // Play the Game Over Scene
+                        currentScene = config.Scene.OVER;
+                        changeScene();
+                    }
+                    
+                    }
+                    this.chargePower = 0;
                 }
                 this.checkCharge();
 
@@ -520,7 +577,7 @@ module scenes {
          * @return void
          */
         public start(): void {
-            
+            var self = this;
 
             // Set Up Scoreboard
             this.setupScoreboard();
@@ -567,7 +624,7 @@ module scenes {
             
             // Add Ambient Light to the scene
             this.addAmbientLight();
-            
+           
             
             // Add Directional Light to the scene
             this.addDirectionalLight();
@@ -596,23 +653,23 @@ module scenes {
                     createjs.Sound.play("coin");
                     this.remove(eventObject);
                     this.setCoinPosition(eventObject);
-                    this.scoreValue += 100;
-                    this.scoreLabel.text = "SCORE: " + this.scoreValue;
+                    scoreValue += 100;
+                    this.scoreLabel.text = "SCORE: " + scoreValue;
                 }
 
                 if (eventObject.name === "DeathPlane") {
                     createjs.Sound.play("hit");
-                    this.livesValue--;
-                    this.livesLabel.text = "LIVES: " + this.livesValue;
+                    shotsValue--;
+                   
                     this.remove(this.player);
-                    this.player.position.set(0, 30, 10);
+                    this.player.position.set(0, 0, 0);
                     this.add(this.player);
                 }
             }.bind(this));
 
             // create parent-child relationship with camera and player
-            this.add(camera);
-            camera.position.set(0, 5, 30);
+            this.player.add(camera);
+            camera.position.set(0, 20, 40);
             
             // Add UI Elements
             this.addReticle();
@@ -665,8 +722,8 @@ module scenes {
          */
         public resize(): void {
             canvas.style.width = "100%";
-            this.livesLabel.x = config.Screen.WIDTH * 0.1;
-            this.livesLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.shotsLabel.x = config.Screen.WIDTH * 0.1;
+            this.shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.scoreLabel.x = config.Screen.WIDTH * 0.8;
             this.scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.update();
