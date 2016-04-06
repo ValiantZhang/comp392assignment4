@@ -7,10 +7,10 @@ module scenes {
     /**
      * The Play class is where the main action occurs for the game
      * 
-     * @class Play
+     * @class Level1
      * @param havePointerLock {boolean}
      */
-    export class Play extends scenes.Scene {
+    export class Level1 extends scenes.Scene {
         private havePointerLock: boolean;
         private element: any;
 

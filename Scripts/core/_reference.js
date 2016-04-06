@@ -4,6 +4,7 @@
 /// <reference path="../objects/builder.ts" />
 /// <reference path="../config/screen.ts"/>
 /// <reference path="../scenes/scene.ts" />
+/// <reference path="../scenes/levels/level1.ts" />
 /// <reference path="../scenes/play.ts" />
 /// <reference path="../scenes/menu.ts" /> 
 

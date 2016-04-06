@@ -46,6 +46,7 @@ var renderer: Renderer;
 var camera: PerspectiveCamera;
 
 var play: scenes.Play;
+var level1: scenes.Level1;
 var menu: scenes.Menu;
 var over: scenes.Over;
 
@@ -170,6 +171,12 @@ function changeScene(): void {
             play = new scenes.Play();
             scene = play;
             console.log("Starting PLAY Scene");
+            break;
+        case config.Scene.LEVEL1:
+            // show the level 1 scene
+            level1 = new scenes.Level1();
+            scene = level1;
+            console.log("Starting level 1 Scene");
             break;
         case config.Scene.OVER:
             // show the game OVER scene

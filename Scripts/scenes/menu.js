@@ -98,6 +98,10 @@ var scenes;
             this._tutorialButton.x = config.Screen.WIDTH * 0.5;
             this._tutorialButton.y = (config.Screen.HEIGHT * 0.45) + 100;
             this._stage.addChild(this._tutorialButton);
+            this._tutorialButton.on("click", function (event) {
+                currentScene = config.Scene.PLAY;
+                changeScene();
+            });
             this._level1Button = new createjs.Bitmap(assets.getResult("Level1Button"));
             this._level1Button.scaleX = 0.25;
             this._level1Button.scaleY = 0.25;
@@ -107,7 +111,7 @@ var scenes;
             this._level1Button.y = (config.Screen.HEIGHT * 0.55) + 100;
             this._stage.addChild(this._level1Button);
             this._level1Button.on("click", function (event) {
-                currentScene = config.Scene.PLAY;
+                currentScene = config.Scene.LEVEL1;
                 changeScene();
             });
             this._level2Button = new createjs.Bitmap(assets.getResult("Level2Button"));
@@ -118,6 +122,10 @@ var scenes;
             this._level2Button.x = config.Screen.WIDTH * 0.5;
             this._level2Button.y = (config.Screen.HEIGHT * 0.65) + 100;
             this._stage.addChild(this._level2Button);
+            this._level2Button.on("click", function (event) {
+                currentScene = config.Scene.PLAY;
+                changeScene();
+            });
             this._level3Button = new createjs.Bitmap(assets.getResult("Level3Button"));
             this._level3Button.scaleX = 0.25;
             this._level3Button.scaleY = 0.25;
@@ -126,6 +134,10 @@ var scenes;
             this._level3Button.x = config.Screen.WIDTH * 0.5;
             this._level3Button.y = (config.Screen.HEIGHT * 0.75) + 100;
             this._stage.addChild(this._level3Button);
+            this._level3Button.on("click", function (event) {
+                currentScene = config.Scene.PLAY;
+                changeScene();
+            });
             // Add buttons to an array for hover events
             this._buttons = [];
             this._buttons[0] = this._tutorialButton;
