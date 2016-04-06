@@ -107,7 +107,7 @@ module builder {
             rogueSphere.position.set(posX, posY, posZ);
             rogueSphere.name = projectileName;
             attachTo.add(rogueSphere);
-            rogueSphere.applyCentralForce(new Vector3( launchYaw, launchAngle, -launchPower));
+            rogueSphere.applyCentralForce(new Vector3( -launchYaw, launchAngle, -launchPower));
             
             rogueSphere.addEventListener('collision', (object) => {
                 if (object.name === "standard") {

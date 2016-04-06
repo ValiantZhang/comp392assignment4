@@ -99,7 +99,7 @@ var builder;
             rogueSphere.position.set(posX, posY, posZ);
             rogueSphere.name = projectileName;
             attachTo.add(rogueSphere);
-            rogueSphere.applyCentralForce(new Vector3(launchYaw, launchAngle, -launchPower));
+            rogueSphere.applyCentralForce(new Vector3(-launchYaw, launchAngle, -launchPower));
             rogueSphere.addEventListener('collision', function (object) {
                 if (object.name === "standard") {
                     scoreValue += 100;

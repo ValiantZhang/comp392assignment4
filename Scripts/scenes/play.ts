@@ -237,7 +237,7 @@ module scenes {
             this.playerMaterial = new LambertMaterial({ color: 0x00ff00 });
 
             this.player = new THREE.Mesh(this.playerGeometry, this.playerMaterial);
-            this.player.position.set(0, 0, 0);
+            this.player.position.set(0, 4, 0);
             this.player.receiveShadow = true;
             this.player.castShadow = true;
             this.player.name = "Player";
@@ -404,9 +404,9 @@ module scenes {
          * @return void
          */
         pointerLockChange(event): void {
-            if (document.pointerLockElement === this.element/* ||
+            if (document.pointerLockElement === this.element ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element*/){
+                document.webkitPointerLockElement === this.element){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
@@ -476,8 +476,8 @@ module scenes {
                 this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z, 
                 1, 5, 5, this, launchPower, launchAngle, launchYaw);
              }
-             console.log(launchPower + launchAngle + launchYaw);
          }
+
 
         // Check Controls Function
 
@@ -501,7 +501,7 @@ module scenes {
                 }
                 else {
                     if (this.chargePower > 1){
-                    this.launchSphere(this.chargePower * 5000 * delta, camera.rotation.x, camera.rotation.y);
+                    this.launchSphere(this.chargePower * 5000 * delta, camera.rotation.x * 2000, camera.rotation.y * 700);
                     shotsValue--;
                     this.shotsLabel.text = "Shots: " + shotsValue;
                      if (shotsValue <= 0) {
@@ -662,14 +662,14 @@ module scenes {
                     shotsValue--;
                    
                     this.remove(this.player);
-                    this.player.position.set(0, 0, 0);
+                    this.player.position.set(0, 20, 40);
                     this.add(this.player);
                 }
             }.bind(this));
 
             // create parent-child relationship with camera and player
             this.player.add(camera);
-            camera.position.set(0, 20, 40);
+            camera.position.set(0,2,0);
             
             // Add UI Elements
             this.addReticle();
