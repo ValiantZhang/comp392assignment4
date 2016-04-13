@@ -132,7 +132,7 @@ module scenes {
                 changeScene();
             });
             
-            this._level2Button = new createjs.Bitmap(assets.getResult("Level2Button"));
+            /*this._level2Button = new createjs.Bitmap(assets.getResult("Level2Button"));
             this._level2Button.scaleX = 0.25;
             this._level2Button.scaleY = 0.25;
             this._level2Button.regX = this._level2Button.getBounds().width * 0.5;
@@ -142,7 +142,7 @@ module scenes {
             this._stage.addChild(this._level2Button);
             
             this._level2Button.on("click", (event: createjs.MouseEvent) => {
-                currentScene = config.Scene.PLAY;
+                currentScene = config.Scene.LEVEL2;
                 changeScene();
             });
             
@@ -156,17 +156,17 @@ module scenes {
             this._stage.addChild(this._level3Button);
             
             this._level3Button.on("click", (event: createjs.MouseEvent) => {
-                currentScene = config.Scene.PLAY;
+                currentScene = config.Scene.LEVEL3;
                 changeScene();
-            });
+            });*/
             
             // Add buttons to an array for hover events
             this._buttons = [];
             
             this._buttons[0] = this._tutorialButton;
             this._buttons[1] = this._level1Button;
-            this._buttons[2] = this._level2Button;
-            this._buttons[3] = this._level3Button;
+            /*this._buttons[2] = this._level2Button;
+            this._buttons[3] = this._level3Button;*/
             
             // Loop through buttons
             for (var i = 0; i < this._buttons.length; i++){
@@ -180,7 +180,7 @@ module scenes {
                     event.target.scaleY = 0.25;
                 });
                 
-                this._buttons[i].on("mousedown", (event: createjs.MouseEvent) => {
+                /*this._buttons[i].on("mousedown", (event: createjs.MouseEvent) => {
                     event.target.scaleX = 0.26;
                     event.target.scaleY = 0.26;
                 });
@@ -188,7 +188,7 @@ module scenes {
                 this._buttons[i].on("click", (event: createjs.MouseEvent) => {
                     event.target.scaleX = 0.28;
                     event.target.scaleY = 0.28;
-                });
+                });*/
             }
             
             

@@ -7,10 +7,10 @@ module scenes {
     /**
      * The Play class is where the main action occurs for the game
      * 
-     * @class Level1
+     * @class Level2
      * @param havePointerLock {boolean}
      */
-    export class Level1 extends scenes.Scene {
+    export class Level2 extends scenes.Scene {
         private havePointerLock: boolean;
         private element: any;
 
@@ -95,7 +95,7 @@ module scenes {
             // Create to HTMLElements
             this.blocker = document.getElementById("blocker");
             this.instructions = document.getElementById("instructions");
-            this.blocker.style.display = "block";
+            this.blocker.style.display = "none";
 
             // setup canvas for menu scene
             this._setupCanvas();
@@ -112,6 +112,9 @@ module scenes {
             // Instantiate Game Controls
             this.keyboardControls = new objects.KeyboardControls();
             this.mouseControls = new objects.MouseControls();
+            
+            this.keyboardControls.enabled = true;
+            this.mouseControls.enabled = true;
         }
         /**
          * This method sets up the scoreboard for the scene
@@ -205,11 +208,11 @@ module scenes {
 
             this.groundMaterial = new PhongMaterial({ color: 0x00FF00 });
             /*this.groundMaterial.map = this.groundTexture;
-            this.groundMaterial.bumpMap = this.groundTextureNormal;
+            this.groundMaterial.bumpMap = this.groundText
             this.groundMaterial.bumpScale = 0.2;*/
 
             this.groundGeometry = new BoxGeometry(128, 1, 128);
-            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0.4, 0.1);
+            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0.8, 0);
             this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
             this.ground.receiveShadow = true;
             this.ground.name = "Ground";
@@ -248,6 +251,22 @@ module scenes {
             //console.log("Added Player to Scene");
         }
 
+        /**
+         * Add the death plane to the scene
+         * 
+         * @method addDeathPlane
+         * @return void
+         */
+        /*private addDeathPlane(): void {
+            this.deathPlaneGeometry = new BoxGeometry(100, 1, 100);
+            this.deathPlaneMaterial = Physijs.createMaterial(new MeshBasicMaterial({ color: 0xff0000 }), 0.4, 0.6);
+
+            this.deathPlane = new Physijs.BoxMesh(this.deathPlaneGeometry, this.deathPlaneMaterial, 0);
+            this.deathPlane.position.set(0, -10, 0);
+            this.deathPlane.name = "DeathPlane";
+            this.add(this.deathPlane);
+        }*/
+        
         /**
          * Adds the reticle to the camera
          * 
@@ -307,30 +326,43 @@ module scenes {
         }
        
         private generateLevel():void{
+            
+            //Add platform for cubes to be set ontop of
+            this.creator.createPlatform(0, 1.5, -30, 7, 5, 3, 5, this);
+            
+            
             //Create Golden Cubes
-            this.creator.createCube(-5.5, 6.5, -15.5, 1, this);
-            this.creator.createCube(-0.5, 6.5, -15.5, 1, this);
-            this.creator.createCube(4.5, 6.5, -15.5, 1, this);
+            this.creator.createCube(-3, 6, -30, 1, this);
+            this.creator.createCube(-0, 6, -30, 1, this);
+            this.creator.createCube(2, 6, -30, 1, this);
             
             // Set Positions
-            var cubetangle1Pos = new Vector3(-5, 0, -15);
-            var cubetangle2Pos = new Vector3(0, 0, -15);
-            var cubetangle3Pos = new Vector3(5, 0, -15);
-            var cubeamid1Pos = new Vector3(-5, 3, -15);
-            var cubeamid2Pos = new Vector3(0, 3, -15);
-            var cubeamid3Pos = new Vector3(5, 3, -15);
+            var cubetangle1Pos = new Vector3(-3, 3, -30);
+            var cubetangle2Pos = new Vector3(0, 3, -30);
+            var cubetangle3Pos = new Vector3(3, 3, -30);
+            var cubetangle4Pos = new Vector3(0, 3, -28);
+            var cubetangle5Pos = new Vector3(0, 3, -32);
+            //var cubeamid1Pos = new Vector3(-3, 5, -31);
+            //var cubeamid2Pos = new Vector3(0, 5, -31);
+            //var cubeamid3Pos = new Vector3(3, 5, -33);
             
             // Instantiate Cubetangles
-            this.creator.createCubetangle(3, 3, 3, cubetangle1Pos, this);
-            this.creator.createCubetangle(3, 3, 3, cubetangle2Pos, this);
-            this.creator.createCubetangle(3, 3, 3, cubetangle3Pos, this);
+            this.creator.createCubetangle(2, 2, 2, cubetangle1Pos, this);
+            this.creator.createCubetangle(2, 2, 2, cubetangle2Pos, this);
+            this.creator.createCubetangle(2, 2, 2, cubetangle3Pos, this);
+            this.creator.createCubetangle(4, 3, 2, cubetangle4Pos, this);
+            this.creator.createCubetangle(4, 3, 2, cubetangle5Pos, this);
             
             // Instantiate Cubeamids
-            this.creator.createCubeamid(3, cubeamid1Pos, this);
-            this.creator.createCubeamid(3, cubeamid2Pos, this);
-            this.creator.createCubeamid(3, cubeamid3Pos, this);
+            //this.creator.createCubeamid(2, cubeamid1Pos, this);
+            //this.creator.createCubeamid(2, cubeamid2Pos, this);
+            //this.creator.createCubeamid(2, cubeamid3Pos, this);
         }
-    
+        
+
+       
+
+       
         /**
          * Event Handler method for any pointerLockChange events
          * 
@@ -338,7 +370,7 @@ module scenes {
          * @return void
          */
         pointerLockChange(event): void {
-            //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
+            //OMIT MOZ AND WEBKIT TO REMOVE SEMANTIC ERROR
             if (document.pointerLockElement === this.element /*||
                 document.mozPointerLockElement === this.element ||
                 document.webkitPointerLockElement === this.element*/){
@@ -399,7 +431,7 @@ module scenes {
          }
          
          private checkScore(): void{
-             if (scoreValue > 1000){
+             if (scoreValue > 3000){
              currentScene = currentScene + 1;
              changeScene();
              }
@@ -420,7 +452,9 @@ module scenes {
              }
          }
 
+
         // Check Controls Function
+
         /**
          * This method updates the player's position based on user input
          * 
@@ -472,8 +506,10 @@ module scenes {
         }
 
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
+
         /**
          * The start method is the main method for the scene class
+         * 
          * @method start
          * @return void
          */
@@ -488,15 +524,21 @@ module scenes {
                 'mozPointerLockElement' in document ||
                 'webkitPointerLockElement' in document;
 
+
+
             // Check to see if we have pointerLock
             if (this.havePointerLock) {
                 this.element = document.body;
+
                 this.instructions.addEventListener('click', () => {
+
                     // Ask the user for pointer lock
                     console.log("Requesting PointerLock");
+
                     this.element.requestPointerLock = this.element.requestPointerLock ||
                         this.element.mozRequestPointerLock ||
                         this.element.webkitRequestPointerLock;
+
                     this.element.requestPointerLock();
                 });
 
@@ -511,15 +553,16 @@ module scenes {
             // Scene changes for Physijs
             this.name = "Main";
             this.fog = new THREE.Fog(0xffffff, 0, 750);
-            this.setGravity(new THREE.Vector3(0, -20, 0));
+            this.setGravity(new THREE.Vector3(0, -10, 0));
 
-          //  this.addEventListener('update', () => {
-             //   this.simulate();
-            //});
+            this.addEventListener('update', () => {
+                this.simulate(undefined, 2);
+            });
             
             // Add Ambient Light to the scene
             this.addAmbientLight();
            
+            
             // Add Directional Light to the scene
             this.addDirectionalLight();
 
@@ -529,12 +572,19 @@ module scenes {
             // Add player controller
             this.addPlayer();
 
+            
+            // Add death plane to the scene
+            //this.addDeathPlane();
+
             // Collision Check
+
+
             this.player.addEventListener('collision', function(eventObject) {
                 if (eventObject.name === "Ground") {
                     this.isGrounded = true;
                     createjs.Sound.play("land");
                 }
+                
             }.bind(this));
 
             // create parent-child relationship with camera and player
@@ -544,10 +594,11 @@ module scenes {
             // Add UI Elements
             this.addReticle();
             this.addChargeBar();
+            
+            
             this.generateLevel();
-            
-             this.simulate();
-            
+
+            this.simulate();
         }
 
         /**
@@ -575,11 +626,9 @@ module scenes {
          * @returns void
          */
         public update(): void {
-            //player.setAngularFactor(new Vector3(0,0,0));
             this.checkControls();
-            this.stage.update();
             this.checkScore();
-            this.simulate();
+            this.stage.update();
         }
 
         /**

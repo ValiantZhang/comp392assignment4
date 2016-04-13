@@ -8,6 +8,7 @@ var BoxGeometry = THREE.BoxGeometry;
 var CubeGeometry = THREE.CubeGeometry;
 var PlaneGeometry = THREE.PlaneGeometry;
 var SphereGeometry = THREE.SphereGeometry;
+var CylinderGeometry = THREE.CylinderGeometry;
 var Geometry = THREE.Geometry;
 var AxisHelper = THREE.AxisHelper;
 var LambertMaterial = THREE.MeshLambertMaterial;
@@ -31,16 +32,20 @@ var Clock = THREE.Clock;
 // Setup a Web Worker for Physijs
 Physijs.scripts.worker = "/Scripts/lib/Physijs/physijs_worker.js";
 Physijs.scripts.ammo = "/Scripts/lib/Physijs/examples/js/ammo.js";
+var myWorker = new Worker(Physijs.scripts.worker);
 // Game Variables
 var scoreValue;
 var shotsValue;
+var scoreLabel;
+var shotsLabel;
 var highScoreValue = 0;
 var scene;
 var currentScene;
 var renderer;
 var camera;
-var play;
 var level1;
+var level2;
+var level3;
 var menu;
 var over;
 var stats;
@@ -56,7 +61,9 @@ var manifest = [
     { id: "Level1Button", src: "../../Assets/images/level1.png" },
     { id: "Level2Button", src: "../../Assets/images/level2.png" },
     { id: "Level3Button", src: "../../Assets/images/level3.png" },
-    { id: "Logo", src: "../../Assets/images/logo.png" }
+    { id: "Logo", src: "../../Assets/images/logo.png" },
+    { id: "menu", src: "../../Assets/images/menu.png" },
+    { id: "playAgain", src: "../../Assets/images/playAgain.png" }
 ];
 function preload() {
     assets = new createjs.LoadQueue();
@@ -137,17 +144,23 @@ function changeScene() {
             scene = menu;
             console.log("Starting MENU Scene");
             break;
-        case config.Scene.PLAY:
-            // show the PLAY scene
-            play = new scenes.Play();
-            scene = play;
-            console.log("Starting PLAY Scene");
-            break;
         case config.Scene.LEVEL1:
             // show the level 1 scene
             level1 = new scenes.Level1();
             scene = level1;
             console.log("Starting level 1 Scene");
+            break;
+        case config.Scene.LEVEL2:
+            // show the level 2 scene
+            level2 = new scenes.Level2();
+            scene = level2;
+            console.log("Starting level 2 Scene");
+            break;
+        case config.Scene.LEVEL3:
+            // show the level 3 scene
+            level3 = new scenes.Level3();
+            scene = level3;
+            console.log("Starting level 3 Scene");
             break;
         case config.Scene.OVER:
             // show the game OVER scene

@@ -38,11 +38,11 @@ module builder {
             //golden
             if(type==1) {
                 basicCubeMaterial = new LambertMaterial({color:0xFFD81C});
-                cubeName="golden"
+                cubeName="golden";
             }  
-            var cubePhysMaterial = Physijs.createMaterial(basicCubeMaterial, 0.1, 0.1);
+            var cubePhysMaterial = Physijs.createMaterial(basicCubeMaterial, 0.8, 0.1);
 
-            var myCube = new Physijs.BoxMesh(cubeGeometry, cubePhysMaterial, 1);
+            var myCube = new Physijs.BoxMesh(cubeGeometry, cubePhysMaterial, 50);
             myCube.position.set(posX, posY, posZ);
             myCube.name = cubeName;
             attachTo.add(myCube);
@@ -93,32 +93,62 @@ module builder {
          * @return void
          */
         public createProjectile(posX: number, posY:number, posZ:number, 
-                          radius:number = 1, width: number = 8, height: number = 8,
                           attachTo: THREE.Object3D, launchPower: number = 1, 
-                          launchAngle: number =1,
-                          launchYaw: number =1): void {
-            var projectileGeometry  = new SphereGeometry(radius, width, height);
+                          launchAngle: number =1, launchYaw: number =1): void {
+            var projectileGeometry  = new SphereGeometry(1, 15, 15);
             var projectileName: string = "Shot";
             var basicProjectileMaterial:LambertMaterial = new LambertMaterial({color:0x000000});
 
-            var projectilePhysMaterial = Physijs.createMaterial(basicProjectileMaterial, 0.1, 0.1);
+            var projectilePhysMaterial = Physijs.createMaterial(basicProjectileMaterial, 0.9, 0.01);
 
-            var rogueSphere = new Physijs.BoxMesh(projectileGeometry, projectilePhysMaterial, 1);
+            var rogueSphere = new Physijs.SphereMesh(projectileGeometry, projectilePhysMaterial, 1000);
             rogueSphere.position.set(posX, posY, posZ);
             rogueSphere.name = projectileName;
             attachTo.add(rogueSphere);
-            rogueSphere.applyCentralForce(new Vector3( -launchYaw, launchAngle, -launchPower));
-            
+            rogueSphere.applyCentralImpulse(new Vector3( -launchYaw * launchPower, launchAngle * launchPower, -launchPower));
+                                            
             rogueSphere.addEventListener('collision', (object) => {
                 if (object.name === "standard") {
                     scoreValue += 100;
+                    scoreLabel.text = "SCORE: " + scoreValue;
                     //this.remove(object);
                 }
                 if (object.name === "golden") {
                     scoreValue += 2500;
+                    scoreLabel.text = "SCORE: " + scoreValue;
                     //this.remove(object);
                 }
             });
         }
+        
+        //LEVEL 2 ASSETS
+        
+         /**
+         *  
+         * Add a platform for level 2 objects to stand on
+         * 
+         * @method createPlatform
+         * @return void
+         */
+        public createPlatform(posX: number, posY:number, posZ:number, 
+                          radiusTop:number = 5, radiusBottom:number = 5, height:number = 5, edges: number = 3, attachTo: THREE.Object3D): void {
+            var platformGeometry  = new CylinderGeometry(radiusTop, radiusBottom, height, edges);
+            var platformName: string = "Platform";
+            var basicCylinderMaterial:LambertMaterial;
+            
+            basicCylinderMaterial = new LambertMaterial({color:0xFF0000});
+
+            var platformPhysMaterial = Physijs.createMaterial(basicCylinderMaterial, 0.8, 0.1);
+
+            var platform = new Physijs.CylinderMesh(platformGeometry, platformPhysMaterial, 0);
+            platform.position.set(posX, posY, posZ);
+            platform.name = platformName;
+            attachTo.add(platform);
+            
+            platform.setAngularFactor(new Vector3(0, 0, 0));
+            platform.setAngularVelocity(new Vector3(0, 0.2, 0));
+            platform.setLinearVelocity(new Vector3(0, 0, 0));
+        }
+        
     }
 }

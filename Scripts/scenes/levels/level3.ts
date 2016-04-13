@@ -7,10 +7,10 @@ module scenes {
     /**
      * The Play class is where the main action occurs for the game
      * 
-     * @class Play
+     * @class Level3
      * @param havePointerLock {boolean}
      */
-    export class Play extends scenes.Scene {
+    export class Level3 extends scenes.Scene {
         private havePointerLock: boolean;
         private element: any;
 
@@ -34,10 +34,6 @@ module scenes {
         private keyboardControls: objects.KeyboardControls;
         private mouseControls: objects.MouseControls;
         private isGrounded: boolean;
-        private coinGeometry: Geometry;
-        private coinMaterial: Physijs.Material;
-        private coins: Physijs.ConcaveMesh[];
-        private coinCount: number;
         private deathPlaneGeometry: CubeGeometry;
         private deathPlaneMaterial: Physijs.Material;
         private deathPlane: Physijs.Mesh;
@@ -58,9 +54,9 @@ module scenes {
         private clock: Clock;
 
         private stage: createjs.Stage;
-        private scoreLabel: createjs.Text;
-        private shotsLabel: createjs.Text;
-        //public scoreValue: number;
+        //private scoreLabel: createjs.Text;
+        //private shotsLabel: createjs.Text;
+        public scoreValue: number;
         //private shotsValue: number;
         private creator :builder.Creator = new builder.Creator();
 
@@ -99,13 +95,13 @@ module scenes {
             // Create to HTMLElements
             this.blocker = document.getElementById("blocker");
             this.instructions = document.getElementById("instructions");
-            this.blocker.style.display = "block";
+            this.blocker.style.display = "none";
 
             // setup canvas for menu scene
             this._setupCanvas();
             
             
-            this.coinCount = 10;
+           
             this.prevTime = 0;
             this.stage = new createjs.Stage(canvas);
             this.velocity = new Vector3(0, 0, 0);
@@ -116,6 +112,9 @@ module scenes {
             // Instantiate Game Controls
             this.keyboardControls = new objects.KeyboardControls();
             this.mouseControls = new objects.MouseControls();
+            
+            this.keyboardControls.enabled = true;
+            this.mouseControls.enabled = true;
         }
         /**
          * This method sets up the scoreboard for the scene
@@ -129,25 +128,25 @@ module scenes {
             shotsValue = 5;
 
             // Add shots Label
-            this.shotsLabel = new createjs.Text(
+            shotsLabel = new createjs.Text(
                 "Shots: " + shotsValue,
                 "40px Consolas",
                 "#ffffff"
             );
-            this.shotsLabel.x = config.Screen.WIDTH * 0.1;
-            this.shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
-            this.stage.addChild(this.shotsLabel);
+            shotsLabel.x = config.Screen.WIDTH * 0.1;
+            shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(shotsLabel);
             console.log("Added shots Label to stage");
 
             // Add Score Label
-            this.scoreLabel = new createjs.Text(
+            scoreLabel = new createjs.Text(
                 "Score: " + scoreValue,
                 "40px Consolas",
                 "#ffffff"
             );
-            this.scoreLabel.x = config.Screen.WIDTH * 0.8;
-            this.scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
-            this.stage.addChild(this.scoreLabel);
+            scoreLabel.x = config.Screen.WIDTH * 0.8;
+            scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(scoreLabel);
             console.log("Added Score Label to stage");
         }
 
@@ -209,11 +208,11 @@ module scenes {
 
             this.groundMaterial = new PhongMaterial({ color: 0x00FF00 });
             /*this.groundMaterial.map = this.groundTexture;
-            this.groundMaterial.bumpMap = this.groundTextureNormal;
+            this.groundMaterial.bumpMap = this.groundText
             this.groundMaterial.bumpScale = 0.2;*/
 
             this.groundGeometry = new BoxGeometry(128, 1, 128);
-            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 1, 0);
+            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0.8, 0);
             this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
             this.ground.receiveShadow = true;
             this.ground.name = "Ground";
@@ -230,14 +229,12 @@ module scenes {
          */
         private addPlayer(): void {
             
-            
-            
             // Player Object
             this.playerGeometry = new BoxGeometry(2, 4, 2);
             this.playerMaterial = new LambertMaterial({ color: 0x00ff00 });
 
             this.player = new THREE.Mesh(this.playerGeometry, this.playerMaterial);
-            this.player.position.set(0, 4, 0);
+            this.player.position.set(0, 2, 10);
             this.player.receiveShadow = true;
             this.player.castShadow = true;
             this.player.name = "Player";
@@ -329,74 +326,43 @@ module scenes {
         }
        
         private generateLevel():void{
+            
+            //Add platform for cubes to be set ontop of
+            this.creator.createPlatform(0, 1.5, -30, 7, 5, 3, 5, this);
+            
+            
             //Create Golden Cubes
-            this.creator.createCube(-5.5, 6.5, -15.5, 1, this);
-            this.creator.createCube(-0.5, 6.5, -15.5, 1, this);
-            this.creator.createCube(4.5, 6.5, -15.5, 1, this);
+            this.creator.createCube(-3, 6, -30, 1, this);
+            this.creator.createCube(-0, 6, -30, 1, this);
+            this.creator.createCube(2, 6, -30, 1, this);
             
             // Set Positions
-            var cubetangle1Pos = new Vector3(-5, 0, -15);
-            var cubetangle2Pos = new Vector3(0, 0, -15);
-            var cubetangle3Pos = new Vector3(5, 0, -15);
-            var cubeamid1Pos = new Vector3(-5, 3, -15);
-            var cubeamid2Pos = new Vector3(0, 3, -15);
-            var cubeamid3Pos = new Vector3(5, 3, -15);
+            var cubetangle1Pos = new Vector3(-3, 3, -30);
+            var cubetangle2Pos = new Vector3(0, 3, -30);
+            var cubetangle3Pos = new Vector3(3, 3, -30);
+            var cubetangle4Pos = new Vector3(0, 3, -28);
+            var cubetangle5Pos = new Vector3(0, 3, -32);
+            //var cubeamid1Pos = new Vector3(-3, 5, -31);
+            //var cubeamid2Pos = new Vector3(0, 5, -31);
+            //var cubeamid3Pos = new Vector3(3, 5, -33);
             
             // Instantiate Cubetangles
-            this.creator.createCubetangle(3, 3, 3, cubetangle1Pos, this);
-            this.creator.createCubetangle(3, 3, 3, cubetangle2Pos, this);
-            this.creator.createCubetangle(3, 3, 3, cubetangle3Pos, this);
+            this.creator.createCubetangle(2, 2, 2, cubetangle1Pos, this);
+            this.creator.createCubetangle(2, 2, 2, cubetangle2Pos, this);
+            this.creator.createCubetangle(2, 2, 2, cubetangle3Pos, this);
+            this.creator.createCubetangle(4, 3, 2, cubetangle4Pos, this);
+            this.creator.createCubetangle(4, 3, 2, cubetangle5Pos, this);
             
             // Instantiate Cubeamids
-            this.creator.createCubeamid(3, cubeamid1Pos, this);
-            this.creator.createCubeamid(3, cubeamid2Pos, this);
-            this.creator.createCubeamid(3, cubeamid3Pos, this);
+            //this.creator.createCubeamid(2, cubeamid1Pos, this);
+            //this.creator.createCubeamid(2, cubeamid2Pos, this);
+            //this.creator.createCubeamid(2, cubeamid3Pos, this);
         }
         
 
-        /**
-         * This method adds a coin to the scene
-         * 
-         * @method addCoinMesh
-         * @return void
-         */
-        private addCoinMesh(): void {
-            var self = this;
+       
 
-            this.coins = new Array<Physijs.ConvexMesh>(); // Instantiate a convex mesh array
-
-            var coinLoader = new THREE.JSONLoader().load("../../Assets/imported/coin.json", function(geometry: THREE.Geometry) {
-                var phongMaterial = new PhongMaterial({ color: 0xE7AB32 });
-                phongMaterial.emissive = new THREE.Color(0xE7AB32);
-
-                var coinMaterial = Physijs.createMaterial((phongMaterial), 0.4, 0.6);
-
-                for (var count: number = 0; count < self.coinCount; count++) {
-                    self.coins[count] = new Physijs.ConvexMesh(geometry, coinMaterial);
-                    self.coins[count].receiveShadow = true;
-                    self.coins[count].castShadow = true;
-                    self.coins[count].name = "Coin";
-                    self.setCoinPosition(self.coins[count]);
-                    console.log("Added Coin Mesh to Scene, at position: " + self.coins[count].position);
-                }
-            });
-
-
-        }
-
-        /**
-         * This method randomly sets the coin object's position
-         * 
-         * @method setCoinPosition
-         * @return void
-         */
-        private setCoinPosition(coin: Physijs.ConvexMesh): void {
-            var randomPointX: number = Math.floor(Math.random() * 20) - 10;
-            var randomPointZ: number = Math.floor(Math.random() * 20) - 10;
-            coin.position.set(randomPointX, 10, randomPointZ);
-            this.add(coin);
-        }
-
+       
         /**
          * Event Handler method for any pointerLockChange events
          * 
@@ -404,6 +370,7 @@ module scenes {
          * @return void
          */
         pointerLockChange(event): void {
+            //OMIT MOZ AND WEBKIT TO REMOVE SEMANTIC ERROR
             if (document.pointerLockElement === this.element /*||
                 document.mozPointerLockElement === this.element ||
                 document.webkitPointerLockElement === this.element*/){
@@ -413,7 +380,7 @@ module scenes {
                 this.blocker.style.display = 'none';
             } else {
                 // disable our mouse and keyboard controls
-                if (shotsValue <= 0) {
+                if (currentScene == 5) {
                     this.blocker.style.display = 'none';
                     document.removeEventListener('pointerlockchange', this.pointerLockChange.bind(this), false);
                     document.removeEventListener('mozpointerlockchange', this.pointerLockChange.bind(this), false);
@@ -463,6 +430,13 @@ module scenes {
              }
          }
          
+         private checkScore(): void{
+             if (scoreValue > 10000){
+             currentScene = currentScene + 1;
+             changeScene();
+             }
+         }
+         
          /**
          * This method creates and launches a sphere projectile
          * 
@@ -473,8 +447,8 @@ module scenes {
          */
          private launchSphere(launchPower: number, launchAngle: number, launchYaw: number): void{
              if (shotsValue > 0){
-                this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z, 
-                1, 5, 5, this, launchPower, launchAngle, launchYaw);
+                this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z - 2, 
+                this, launchPower, launchAngle, launchYaw);
              }
          }
 
@@ -491,77 +465,40 @@ module scenes {
             if (this.keyboardControls.enabled) {
                 
                 //this.velocity = new Vector3();
-
                 var time: number = performance.now();
                 var delta: number = (time - this.prevTime) / 1000;
                 
-                                //ChargeBar
+                //ChargeBar
                 if (this.keyboardControls.charge){
-                    this.chargePower += 3 * delta;
+                    this.chargePower += 5 * delta;
                 }
                 else {
-                    if (this.chargePower > 1){
-                    this.launchSphere(this.chargePower * 5000 * delta, camera.rotation.x * 2000, camera.rotation.y * 700);
-                    shotsValue--;
-                    this.shotsLabel.text = "Shots: " + shotsValue;
-                     if (shotsValue <= 0) {
-                        // Exit Pointer Lock
-                        document.exitPointerLock();
-                        this.children = []; // an attempt to clean up
-                        this.player.remove(camera);
-
-                        // Play the Game Over Scene
-                        currentScene = config.Scene.OVER;
-                        changeScene();
-                    }
-                    
-                    }
+                    if (this.chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
+                        this.launchSphere(this.chargePower * 5000, camera.rotation.x, camera.rotation.y);
+                        shotsValue--;
+                        shotsLabel.text = "Shots: " + shotsValue;
+                        if (shotsValue <= 0) {
+                            setTimeout(() => {
+                                // Exit Pointer Lock
+                                document.exitPointerLock();
+                                this.children = []; // an attempt to clean up
+                                this.player.remove(camera);
+        
+                                // Play the Game Over Scene
+                                currentScene = config.Scene.OVER;
+                                changeScene();
+                            }, 5000);
+                        }
                     this.chargePower = 0;
+                    }
                 }
                 this.checkCharge();
-
-                /*if (this.isGrounded) {
-                    var direction = new Vector3(0, 0, 0);
-                    if (this.keyboardControls.moveForward) {
-                        this.velocity.z -= 400.0 * delta;
-                    }
-                    if (this.keyboardControls.moveLeft) {
-                        this.velocity.x -= 400.0 * delta;
-                    }
-                    if (this.keyboardControls.moveBackward) {
-                        this.velocity.z += 400.0 * delta;
-                    }
-                    if (this.keyboardControls.moveRight) {
-                        this.velocity.x += 400.0 * delta;
-                    }
-                    if (this.keyboardControls.jump) {
-                        this.velocity.y += 4000.0 * delta;
-                        if (this.player.position.y > 4) {
-                            this.isGrounded = false;
-                            createjs.Sound.play("jump");
-                        }
-
-                    }
-
-                    this.player.setDamping(0.7, 0.1);
-                    // Changing player's rotation
-                    this.player.setAngularVelocity(new Vector3(0, this.mouseControls.yaw, 0));
-                    direction.addVectors(direction, this.velocity);
-                    direction.applyQuaternion(this.player.quaternion);
-                    if (Math.abs(this.player.getLinearVelocity().x) < 20 && Math.abs(this.player.getLinearVelocity().y) < 10) {
-                        this.player.applyCentralForce(direction);
-                    }*/
-
-                    this.cameraLook();
-
-                } // isGrounded ends
-
+                this.cameraLook();
                 //reset Pitch and Yaw
                 this.mouseControls.pitch = 0;
                 this.mouseControls.yaw = 0;
-
                 this.prevTime = time;
-            //} 
+            } 
             // Controls Enabled ends
             /*else {
                 this.player.setAngularVelocity(new Vector3(0, 0, 0));
@@ -635,9 +572,7 @@ module scenes {
             // Add player controller
             this.addPlayer();
 
-            // Add custom coin imported from Blender
-            //this.addCoinMesh();
-
+            
             // Add death plane to the scene
             //this.addDeathPlane();
 
@@ -649,27 +584,12 @@ module scenes {
                     this.isGrounded = true;
                     createjs.Sound.play("land");
                 }
-                if (eventObject.name === "Coin") {
-                    createjs.Sound.play("coin");
-                    this.remove(eventObject);
-                    this.setCoinPosition(eventObject);
-                    scoreValue += 100;
-                    this.scoreLabel.text = "SCORE: " + scoreValue;
-                }
-
-                if (eventObject.name === "DeathPlane") {
-                    createjs.Sound.play("hit");
-                    shotsValue--;
-                   
-                    this.remove(this.player);
-                    this.player.position.set(0, 20, 40);
-                    this.add(this.player);
-                }
+                
             }.bind(this));
 
             // create parent-child relationship with camera and player
             this.player.add(camera);
-            camera.position.set(0,2,0);
+            //camera.position.set(0,10,35);//CONSTANT
             
             // Add UI Elements
             this.addReticle();
@@ -690,12 +610,14 @@ module scenes {
         private cameraLook(): void {
             var zenith: number = THREE.Math.degToRad(25);
             var nadir: number = THREE.Math.degToRad(-25);
+            var zenith2: number = THREE.Math.degToRad(25);
+            var nadir2: number = THREE.Math.degToRad(0);
 
             var cameraPitch: number = camera.rotation.x + this.mouseControls.pitch;
             var cameraYaw: number = camera.rotation.y + this.mouseControls.yaw;
 
             // Constrain the Camera Pitch & Yaw
-            camera.rotation.x = THREE.Math.clamp(cameraPitch, nadir, zenith);
+            camera.rotation.x = THREE.Math.clamp(cameraPitch, nadir2, zenith2);
             camera.rotation.y = THREE.Math.clamp(cameraYaw, nadir, zenith);
         }
 
@@ -704,13 +626,8 @@ module scenes {
          * @returns void
          */
         public update(): void {
-            /*
-            this.coins.forEach(coin => {
-                coin.setAngularFactor(new Vector3(0, 0, 0));
-                coin.setAngularVelocity(new Vector3(0, 1, 0));
-            });*/
-
             this.checkControls();
+            this.checkScore();
             this.stage.update();
         }
 
@@ -722,10 +639,10 @@ module scenes {
          */
         public resize(): void {
             canvas.style.width = "100%";
-            this.shotsLabel.x = config.Screen.WIDTH * 0.1;
-            this.shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
-            this.scoreLabel.x = config.Screen.WIDTH * 0.8;
-            this.scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            shotsLabel.x = config.Screen.WIDTH * 0.1;
+            shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            scoreLabel.x = config.Screen.WIDTH * 0.8;
+            scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.update();
         }
     }
