@@ -404,6 +404,7 @@ module scenes {
                 //ChargeBar
                 if (this.keyboardControls.charge){
                     chargePower += 5 * delta;
+                    createjs.Sound.play("charge");
                 }
                 else if(chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
                         this.launchSphere(chargePower * 5000, camera.rotation.x, camera.rotation.y);

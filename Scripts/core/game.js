@@ -65,6 +65,7 @@ var manifest = [
     { id: "standardHit", src: "../../Assets/audio/StandardHit.wav" },
     { id: "goldenHit", src: "../../Assets/audio/GoldenHit.wav" },
     { id: "lvlChng", src: "../../Assets/audio/LevelChangeAlert.wav" },
+    { id: "charge", src: "../../Assets/audio/ChargeUp.wav" },
     // Images
     { id: "StartButton", src: "../../Assets/images/StartButton.png" },
     { id: "TutorialButton", src: "../../Assets/images/tutorial.png" },
@@ -217,5 +218,3 @@ function changeScene() {
     createjs.Sound.play("lvlChng");
 }
 window.onload = preload;
-
-//# sourceMappingURL=game.js.map

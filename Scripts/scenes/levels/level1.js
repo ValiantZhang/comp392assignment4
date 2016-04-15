@@ -323,6 +323,7 @@ var scenes;
                 //ChargeBar
                 if (this.keyboardControls.charge) {
                     chargePower += 5 * delta;
+                    createjs.Sound.play("charge");
                 }
                 else if (chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0) {
                     this.launchSphere(chargePower * 5000, camera.rotation.x, camera.rotation.y);
@@ -470,5 +471,3 @@ var scenes;
     }(scenes.Scene));
     scenes.Level1 = Level1;
 })(scenes || (scenes = {}));
-
-//# sourceMappingURL=level1.js.map

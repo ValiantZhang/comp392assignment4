@@ -19,5 +19,3 @@ var objects;
     }());
     objects.MouseControls = MouseControls;
 })(objects || (objects = {}));
-
-//# sourceMappingURL=mousecontrols.js.map

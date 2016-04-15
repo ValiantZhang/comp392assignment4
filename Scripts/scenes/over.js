@@ -142,5 +142,3 @@ var scenes;
     }(scenes.Scene));
     scenes.Over = Over;
 })(scenes || (scenes = {}));
-
-//# sourceMappingURL=over.js.map

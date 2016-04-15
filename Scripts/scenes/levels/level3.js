@@ -499,5 +499,3 @@ var scenes;
     }(scenes.Scene));
     scenes.Level3 = Level3;
 })(scenes || (scenes = {}));
-
-//# sourceMappingURL=level3.js.map
