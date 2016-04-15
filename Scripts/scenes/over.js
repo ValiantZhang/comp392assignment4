@@ -91,7 +91,7 @@ var scenes;
             this._playAgainButton.y = (config.Screen.HEIGHT * 0.55) + 100;
             this._stage.addChild(this._playAgainButton);
             this._playAgainButton.on("click", function (event) {
-                currentScene = currentScene;
+                currentScene = lastPlayedScene;
                 changeScene();
             });
             // Add buttons to an array for hover events
@@ -142,3 +142,5 @@ var scenes;
     }(scenes.Scene));
     scenes.Over = Over;
 })(scenes || (scenes = {}));
+
+//# sourceMappingURL=over.js.map

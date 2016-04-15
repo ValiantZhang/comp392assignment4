@@ -42,6 +42,7 @@ var highScoreValue = 0;
 var levelGoal;
 var scene;
 var currentScene;
+var lastPlayedScene; //for the replay button
 var renderer;
 var camera;
 //Charge Bar
@@ -55,6 +56,7 @@ var level2;
 var level3;
 var menu;
 var over;
+var tut;
 var stats;
 var canvas;
 var assets;
@@ -65,14 +67,15 @@ var manifest = [
     { id: "standardHit", src: "../../Assets/audio/StandardHit.wav" },
     { id: "goldenHit", src: "../../Assets/audio/GoldenHit.wav" },
     { id: "lvlChng", src: "../../Assets/audio/LevelChangeAlert.wav" },
-    { id: "charge", src: "../../Assets/audio/ChargeUp.wav" },
+    { id: "charge", src: "../../Assets/audio/ChargeUp.mp3" },
     // Images
     { id: "StartButton", src: "../../Assets/images/StartButton.png" },
-    { id: "TutorialButton", src: "../../Assets/images/tutorial.png" },
+    { id: "TutorialButton", src: "../../Assets/images/tutorialButton.png" },
     { id: "Level1Button", src: "../../Assets/images/level1.png" },
     { id: "Level2Button", src: "../../Assets/images/level2.png" },
     { id: "Level3Button", src: "../../Assets/images/level3.png" },
     { id: "Logo", src: "../../Assets/images/logo.png" },
+    { id: "tutorial", src: "../../Assets/images/tutorial.png" },
     { id: "menu", src: "../../Assets/images/menu.png" },
     { id: "playAgain", src: "../../Assets/images/playAgain.png" },
     { id: "play", src: "../../Assets/images/play.png" },
@@ -214,7 +217,15 @@ function changeScene() {
             scene = over;
             console.log("Starting OVER Scene");
             break;
+        case config.Scene.TUT:
+            // show the tutorial scene
+            tut = new scenes.Tutorial();
+            scene = tut;
+            console.log("Starting Tutorial Scene");
+            break;
     }
     createjs.Sound.play("lvlChng");
 }
 window.onload = preload;
+
+//# sourceMappingURL=game.js.map

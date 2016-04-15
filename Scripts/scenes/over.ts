@@ -105,7 +105,7 @@ module scenes {
             this._stage.addChild(this._playAgainButton);
             
             this._playAgainButton.on("click", (event: createjs.MouseEvent) => {
-                currentScene = currentScene;
+                currentScene = lastPlayedScene;
                 changeScene();
             });
             

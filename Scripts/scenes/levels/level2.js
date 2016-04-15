@@ -234,9 +234,9 @@ var scenes;
          */
         Level2.prototype.pointerLockChange = function (event) {
             //OMIT MOZ AND WEBKIT TO REMOVE SEMANTIC ERROR
-            if (document.pointerLockElement === this.element ||
+            if (document.pointerLockElement === this.element /*||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element) {
+                document.webkitPointerLockElement === this.element*/) {
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
@@ -348,6 +348,7 @@ var scenes;
                         _this.player.remove(camera);
                         // Play the Game Over Scene
                         currentScene = config.Scene.OVER;
+                        lastPlayedScene = 2;
                         changeScene();
                     }
                     else {
@@ -371,10 +372,10 @@ var scenes;
         Level2.prototype.start = function () {
             var _this = this;
             var self = this;
-            shotsValue = 5;
-            shotsLabel.text = "Shots:" + shotsValue;
             // Set Up Scoreboard
             this.setupScoreboard();
+            shotsValue = 5;
+            shotsLabel.text = "Shots:" + shotsValue;
             //check to see if pointerlock is supported
             this.havePointerLock = 'pointerLockElement' in document ||
                 'mozPointerLockElement' in document ||
@@ -463,3 +464,5 @@ var scenes;
     }(scenes.Scene));
     scenes.Level2 = Level2;
 })(scenes || (scenes = {}));
+
+//# sourceMappingURL=level2.js.map

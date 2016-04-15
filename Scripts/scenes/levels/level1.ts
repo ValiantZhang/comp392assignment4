@@ -50,7 +50,7 @@ module scenes {
         public scoreValue: number;
         private creator :builder.Creator = new builder.Creator();
         
-        private scoreRequired:number =7500; //Score required to pass the level
+        private scoreRequired:number =5000; //Score required to pass the level
         private levelTransitionInProgress:boolean=false;
 
         
@@ -307,9 +307,9 @@ module scenes {
          */
         pointerLockChange(event): void {
             //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
-            if (document.pointerLockElement === this.element ||
+            if (document.pointerLockElement === this.element /*||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element){
+                document.webkitPointerLockElement === this.element*/){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
@@ -432,6 +432,7 @@ module scenes {
                         this.player.remove(camera);
             
                         // Play the Game Over Scene
+                        lastPlayedScene=1;
                         currentScene = config.Scene.OVER;
                         changeScene();
                     }
@@ -444,7 +445,7 @@ module scenes {
                         currentScene = currentScene + 1;
                         changeScene();
                     }
-                }, 5000);
+                }, 4000);//2 seconds not really enought I think  
             }
         }
 

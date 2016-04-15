@@ -48,6 +48,8 @@ var levelGoal: createjs.Text;
 
 var scene: scenes.Scene;
 var currentScene: number;
+var lastPlayedScene:number;//for the replay button
+
 var renderer: Renderer;
 var camera: PerspectiveCamera;
 
@@ -63,7 +65,7 @@ var level2: scenes.Level2;
 var level3: scenes.Level3;
 var menu: scenes.Menu;
 var over: scenes.Over;
-
+var tut: scenes.Tutorial;
 
 
 var stats: Stats;
@@ -76,14 +78,15 @@ var manifest = [
     { id: "standardHit", src: "../../Assets/audio/StandardHit.wav" },
     { id: "goldenHit", src: "../../Assets/audio/GoldenHit.wav" },
     { id: "lvlChng", src: "../../Assets/audio/LevelChangeAlert.wav" },
-    { id: "charge", src: "../../Assets/audio/ChargeUp.wav" },
+    { id: "charge", src: "../../Assets/audio/ChargeUp.mp3" },
     // Images
     { id: "StartButton", src: "../../Assets/images/StartButton.png"},
-    { id: "TutorialButton", src: "../../Assets/images/tutorial.png"},
+    { id: "TutorialButton", src: "../../Assets/images/tutorialButton.png"},
     { id: "Level1Button", src: "../../Assets/images/level1.png"},
     { id: "Level2Button", src: "../../Assets/images/level2.png"},
     { id: "Level3Button", src: "../../Assets/images/level3.png"},
     { id: "Logo", src: "../../Assets/images/logo.png"},
+    { id: "tutorial", src: "../../Assets/images/tutorial.png"},
     { id: "menu", src: "../../Assets/images/menu.png"},
     { id: "playAgain", src: "../../Assets/images/playAgain.png"},
     { id: "play", src: "../../Assets/images/play.png"},
@@ -250,6 +253,12 @@ function changeScene(): void {
             over = new scenes.Over();
             scene = over;
             console.log("Starting OVER Scene");
+            break;
+        case config.Scene.TUT:
+            // show the tutorial scene
+            tut = new scenes.Tutorial();
+            scene = tut;
+            console.log("Starting Tutorial Scene");
             break;
     }
     createjs.Sound.play("lvlChng");

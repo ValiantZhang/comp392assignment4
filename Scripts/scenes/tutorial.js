@@ -4,35 +4,32 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 /**
+ * The Scenes module is a namespace to reference all scene objects
+ *
  * @module scenes
  */
 var scenes;
 (function (scenes) {
     /**
-     * Menu Scene extends scenes.Scene superclass is used to
-     * create a custom menu for the THREEJS Game
+     * The Play class is where the main action occurs for the game
      *
-     * @class Menu
-     * @extends scene.Scene
-     * @param blocker {HTMLElement}
-     * @param _stage {createjs.Stage}
-     * @param _gameLabel {createjs.Text}
-     * @param _startButton {createjs.Bitmap}
+     * @class Tutorial
+     * @param havePointerLock {boolean}
      */
-    var Menu = (function (_super) {
-        __extends(Menu, _super);
+    var Tutorial = (function (_super) {
+        __extends(Tutorial, _super);
         /**
          * Empty Constructor - calls _initialize and start methods
          *
          * @constructor
          */
-        function Menu() {
+        function Tutorial() {
             _super.call(this);
             this._initialize();
             this.start();
         }
         // PRIVATE METHODS ++++++++++++++++++++++++++++++++++++++++++++++
-        Menu.prototype._setupCanvas = function () {
+        Tutorial.prototype._setupCanvas = function () {
             canvas.style.width = "100%";
             canvas.setAttribute("height", config.Screen.HEIGHT.toString());
             canvas.style.backgroundColor = "#323776";
@@ -44,7 +41,7 @@ var scenes;
          * @method _initialize
          * @return void
          */
-        Menu.prototype._initialize = function () {
+        Tutorial.prototype._initialize = function () {
             // Create to HTMLElements
             this._blocker = document.getElementById("blocker");
             this._blocker.style.display = "none";
@@ -61,27 +58,15 @@ var scenes;
          * @method start
          * @return void
          */
-        Menu.prototype.start = function () {
-            this._logo = new createjs.Bitmap(assets.getResult("Logo"));
-            this._logo.scaleX = 0.7;
-            this._logo.scaleY = 0.7;
-            this._logo.regX = this._logo.getBounds().width * 0.5;
-            this._logo.regY = this._logo.getBounds().height * 0.5;
-            this._logo.x = config.Screen.WIDTH * 0.5;
-            this._logo.y = (config.Screen.HEIGHT * 0.15) + 100;
-            this._stage.addChild(this._logo);
-            this._tutorialButton = new createjs.Bitmap(assets.getResult("TutorialButton"));
-            this._tutorialButton.scaleX = 0.25;
-            this._tutorialButton.scaleY = 0.25;
-            this._tutorialButton.regX = this._tutorialButton.getBounds().width * 0.5;
-            this._tutorialButton.regY = this._tutorialButton.getBounds().height * 0.5;
-            this._tutorialButton.x = config.Screen.WIDTH * 0.5;
-            this._tutorialButton.y = (config.Screen.HEIGHT * 0.45) + 100;
-            this._stage.addChild(this._tutorialButton);
-            this._tutorialButton.on("click", function (event) {
-                currentScene = config.Scene.TUT;
-                changeScene();
-            });
+        Tutorial.prototype.start = function () {
+            this._tutorial = new createjs.Bitmap(assets.getResult("tutorial"));
+            this._tutorial.scaleX = 0.7;
+            this._tutorial.scaleY = 0.7;
+            this._tutorial.regX = this._tutorial.getBounds().width * 0.5;
+            this._tutorial.regY = this._tutorial.getBounds().height * 0.5;
+            this._tutorial.x = config.Screen.WIDTH * 0.5;
+            this._tutorial.y = (config.Screen.HEIGHT * 0.15) + 100;
+            this._stage.addChild(this._tutorial);
             this._playButton = new createjs.Bitmap(assets.getResult("play"));
             this._playButton.scaleX = 0.25;
             this._playButton.scaleY = 0.25;
@@ -107,10 +92,8 @@ var scenes;
             });
             // Add buttons to an array for hover events
             this._buttons = [];
-            this._buttons[0] = this._tutorialButton;
-            this._buttons[1] = this._playButton;
-            this._buttons[2] = this._quitButton;
-            //this._buttons[3] = this._level3Button;
+            this._buttons[0] = this._playButton;
+            this._buttons[1] = this._quitButton;
             // Loop through buttons
             for (var i = 0; i < this._buttons.length; i++) {
                 this._buttons[i].on("mouseover", function (event) {
@@ -122,14 +105,6 @@ var scenes;
                     event.target.scaleX = 0.25;
                     event.target.scaleY = 0.25;
                 });
-                this._buttons[i].on("mousedown", function (event) {
-                    event.target.scaleX = 0.26;
-                    event.target.scaleY = 0.26;
-                });
-                this._buttons[i].on("click", function (event) {
-                    event.target.scaleX = 0.28;
-                    event.target.scaleY = 0.28;
-                });
             }
         };
         /**
@@ -138,7 +113,7 @@ var scenes;
          * @method update
          * @return void
          */
-        Menu.prototype.update = function () {
+        Tutorial.prototype.update = function () {
             this._stage.update();
         };
         /**
@@ -147,12 +122,12 @@ var scenes;
          * @method resize
          * @return void
          */
-        Menu.prototype.resize = function () {
+        Tutorial.prototype.resize = function () {
             this._setupCanvas();
         };
-        return Menu;
+        return Tutorial;
     }(scenes.Scene));
-    scenes.Menu = Menu;
+    scenes.Tutorial = Tutorial;
 })(scenes || (scenes = {}));
 
-//# sourceMappingURL=menu.js.map
+//# sourceMappingURL=tutorial.js.map

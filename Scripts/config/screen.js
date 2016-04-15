@@ -18,7 +18,10 @@ var config;
         Scene.LEVEL2 = 2;
         Scene.LEVEL3 = 3;
         Scene.OVER = 5;
+        Scene.TUT = 6;
         return Scene;
     }());
     config.Scene = Scene;
 })(config || (config = {}));
+
+//# sourceMappingURL=screen.js.map

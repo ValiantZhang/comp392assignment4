@@ -24,7 +24,7 @@ var scenes;
         function Level1() {
             _super.call(this);
             this.creator = new builder.Creator();
-            this.scoreRequired = 7500; //Score required to pass the level
+            this.scoreRequired = 5000; //Score required to pass the level
             this.levelTransitionInProgress = false;
             this._initialize();
             this.start();
@@ -233,9 +233,9 @@ var scenes;
          */
         Level1.prototype.pointerLockChange = function (event) {
             //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
-            if (document.pointerLockElement === this.element ||
+            if (document.pointerLockElement === this.element /*||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element) {
+                document.webkitPointerLockElement === this.element*/) {
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
@@ -350,6 +350,7 @@ var scenes;
                         _this.children = []; // an attempt to clean up
                         _this.player.remove(camera);
                         // Play the Game Over Scene
+                        lastPlayedScene = 1;
                         currentScene = config.Scene.OVER;
                         changeScene();
                     }
@@ -361,7 +362,7 @@ var scenes;
                         currentScene = currentScene + 1;
                         changeScene();
                     }
-                }, 5000);
+                }, 4000); //2 seconds not really enought I think  
             }
         };
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
@@ -471,3 +472,5 @@ var scenes;
     }(scenes.Scene));
     scenes.Level1 = Level1;
 })(scenes || (scenes = {}));
+
+//# sourceMappingURL=level1.js.map

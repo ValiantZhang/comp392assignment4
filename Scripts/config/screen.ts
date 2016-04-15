@@ -12,6 +12,7 @@ module config {
         public static LEVEL2: number = 2;
         public static LEVEL3: number = 3;
         public static OVER: number = 5;
+        public static TUT: number = 6;
     }
     
 }

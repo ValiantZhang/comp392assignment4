@@ -272,12 +272,15 @@ module scenes {
             var cubeHand: Physijs.BoxMesh;
            
             cubeMan = new Physijs.BoxMesh( new THREE.CubeGeometry( 0.001, 0.001, 0.001 ), new THREE.MeshBasicMaterial({ color: 0x888888 }) ,0);
+            cubeMan.name = "WholeCubeMan";
             cubeBody =  new Physijs.BoxMesh( new THREE.CubeGeometry( 0.001, 0.001, 0.001 ), new THREE.MeshBasicMaterial({ color: 0x888888 }) ,0);
+            cubeBody.name = "WholeCubeBody";
             cubeHand= new Physijs.BoxMesh( new THREE.CubeGeometry( 0.001, 0.001, 0.001 ), new THREE.MeshBasicMaterial({ color: 0x888888 }) ,0);
+            cubeHand.name = "WholeCubeHand";
             
             
             //left leg
-            this.addBodyPart(1,0,0,0.3,0.7,0.2,0,cubeBody);// all values copied-past "as is" from Blender 
+            this.addBodyPart(1,0,0,0.3,0.7,0.2,0,cubeBody);
             this.addBodyPart(1,-0.5,1.6,0.2,0.2,1.25,0,cubeBody);
             this.addBodyPart(0.8,-0.5,4.2,0.2,0.2,1.25,-8,cubeBody);
             //right leg
@@ -288,8 +291,8 @@ module scenes {
             this.addBodyPart(1.8,-0.4,8,0.2,0.2,1,-60,cubeBody);
             //hand - rotating part
             this.addBodyPart(0.3,-0.34,1,0.2,0.2,1,13.6,cubeHand);
-            this.addBodyPart(0.8,-0.45,2.6,2.4,0.2,1.2,26.5,cubeHand);//SHIELD
-            cubeHand.position.set(2.5,7,2.5);
+            this.addBodyPart(0.8,-0.45,2.6,2.4,0.2,1.2,26.5,cubeHand,"shield");//SHIELD
+            cubeHand.position.set(x+2.5,y+7,z+2.5);
             cubeHand.rotation.z=110 /180 * Math.PI;
             //rotationDirection=1;
             
@@ -303,12 +306,16 @@ module scenes {
             this.addBodyPart(0,-0.3,8.5,1,0.4,0.2,0,cubeBody);
             this.addBodyPart(0.0,-0.5,8.7,0.2,0.2,1,0,cubeBody);
             this.addBodyPart(-0.1,-0.35,10,0.7,0.7,0.7,0,cubeBody);
-            
-            cubeMan.add(cubeHand);
-            this.hands.push(cubeHand);
+             
+            this.add(cubeHand);
+            this.hands.push(cubeHand);//her e
             cubeMan.add(cubeBody);
             cubeMan.position.set(x,y,z);
             this.add(cubeMan);
+            
+            //cubeHand.setAngularFactor(new Vector3(0, 0, 0));
+            //cubeHand.setAngularVelocity(new Vector3(0, 1, 0));
+           // cubeHand.applyCentralImpulse(new Vector3(0, 1, 0));
        }
        
         private generateLevel() : void{
@@ -323,11 +330,12 @@ module scenes {
          }
         
         private addBodyPart(x:number,z:number,y:number,h:number,d:number,w:number,
-                            z_rotation:number,attachTo:Object3D):void{
+                            z_rotation:number,attachTo:Object3D,name:string = "soldierPart"):void{
             var cubeMaterial = new LambertMaterial({color:0xFFffFF});
             var cubePhysMaterial = Physijs.createMaterial(cubeMaterial,10,10)
             var cubeGeometry = new BoxGeometry(h*1.8,w*1.8,d*1.8);
             var thisCube = new Physijs.BoxMesh(cubeGeometry,cubeMaterial,0);
+            thisCube.name = name;
             thisCube.position.set(x,y,z);
             thisCube.rotation.z=-z_rotation /180 * Math.PI;
             thisCube.castShadow = true;
@@ -343,13 +351,13 @@ module scenes {
          */
         pointerLockChange(event): void {
             //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
-            if (document.pointerLockElement === this.element ||
+            if (document.pointerLockElement === this.element /*||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element){
+                document.webkitPointerLockElement === this.element*/){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
-                this.blocker.style.display = 'none';
+                this.blocker.style.display = 'none'; 
             } else {
                 // disable our mouse and keyboard controls
                 if (currentScene == 5) {
@@ -460,6 +468,8 @@ module scenes {
                         this.player.remove(camera);
             
                         // Play the Game Over Scene
+                        levelGoal.text = "Cubes dominated! try again";
+                        lastPlayedScene=3;
                         currentScene = config.Scene.OVER;
                         changeScene();
                     }
@@ -469,6 +479,7 @@ module scenes {
                         this.player.remove(camera);
             
                         //go to next level
+                        levelGoal.text = "You won!";
                         currentScene = config.Scene.MENU;;
                         changeScene();
                     }
@@ -568,7 +579,9 @@ module scenes {
         private handsContoller(h:number):void{
              this.hands[h].rotation.z+=this.rotationDirections[h]*0.01*(1+h);
              this.hands[h].__dirtyRotation = true;
-           // cubeHand.__dirtyRotation = true;
+           // this.hands[h].setAngularFactor(new Vector3(0, 0, 0));
+           // this.hands[h].setAngularVelocity(new Vector3(0, 1, 0));
+          
             if(this.hands[h].rotation.z < 30/180 * Math.PI){
                 this.rotationDirections[h]=-this.rotationDirections[h];
                 
@@ -587,9 +600,9 @@ module scenes {
             this.checkLevelChange();
             this.simulate();
            
-           this.handsContoller(0);
+            this.handsContoller(0);
             this.handsContoller(1);
-             this.handsContoller(2);
+            this.handsContoller(2);
            
             
         }
