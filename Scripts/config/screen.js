@@ -17,7 +17,6 @@ var config;
         Scene.LEVEL1 = 1;
         Scene.LEVEL2 = 2;
         Scene.LEVEL3 = 3;
-        Scene.PLAY = 4;
         Scene.OVER = 5;
         return Scene;
     }());

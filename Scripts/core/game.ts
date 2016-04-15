@@ -44,10 +44,19 @@ var scoreLabel: createjs.Text;
 var shotsLabel: createjs.Text;
 var highScoreValue: number = 0;
 
+var levelGoal: createjs.Text;
+
 var scene: scenes.Scene;
 var currentScene: number;
 var renderer: Renderer;
 var camera: PerspectiveCamera;
+
+//Charge Bar
+var chargeBar: Mesh[];
+var chargeBarGeometry: PlaneGeometry;
+var chargeBarMaterials: PhongMaterial[];
+var chargeBarTextures: Texture[];
+var chargePower: number;
 
 var level1: scenes.Level1;
 var level2: scenes.Level2;
@@ -61,10 +70,10 @@ var stats: Stats;
 var canvas: HTMLElement;
 var assets: createjs.LoadQueue;
 var manifest = [
-    { id: "land", src: "../../Assets/audio/Land.wav" },
-    { id: "hit", src: "../../Assets/audio/hit.wav" },
-    { id: "coin", src: "../../Assets/audio/coin.mp3" },
-    { id: "jump", src: "../../Assets/audio/Jump.wav" },
+    // Sounds
+    { id: "bgSound", src: "../../Assets/audio/soundTrack.mp3" },
+    { id: "projectileFlight", src: "../../Assets/audio/projectileInFlyM.mp3" },
+    // Images
     { id: "StartButton", src: "../../Assets/images/StartButton.png"},
     { id: "TutorialButton", src: "../../Assets/images/tutorial.png"},
     { id: "Level1Button", src: "../../Assets/images/level1.png"},
@@ -72,7 +81,9 @@ var manifest = [
     { id: "Level3Button", src: "../../Assets/images/level3.png"},
     { id: "Logo", src: "../../Assets/images/logo.png"},
     { id: "menu", src: "../../Assets/images/menu.png"},
-    { id: "playAgain", src: "../../Assets/images/playAgain.png"}
+    { id: "playAgain", src: "../../Assets/images/playAgain.png"},
+    { id: "play", src: "../../Assets/images/play.png"},
+    { id: "exit", src: "../../Assets/images/exit.png"}
 ];
 
 function preload(): void {
@@ -98,6 +109,9 @@ function init(): void {
 
     // setup the camera
     setupCamera();
+    
+    // add charge bar
+    addChargeBar();
 
     // set initial scene
     currentScene = config.Scene.MENU;
@@ -109,6 +123,9 @@ function init(): void {
     document.body.appendChild(renderer.domElement);
     gameLoop(); // render the scene	
 
+
+    createjs.Sound.play("bgSound",{loop: 99});
+ 
     // setup the resize event listener
     window.addEventListener('resize', onWindowResize, false);
 }
@@ -161,6 +178,40 @@ function setupCamera(): void {
     //camera.position.set(0, 40, 30);
     //camera.lookAt(new Vector3(0, 0, 0));
     console.log("Finished setting up Camera...");
+}
+
+/**
+ * Adds the chargeBar to the camera
+ * 
+ * @method addChargeBar
+ * @return void
+ */
+function addChargeBar(): void {
+    //ChargeBar Object
+    chargePower = 1.0;
+    chargeBarGeometry = new PlaneGeometry(0.03, 0.015);
+    chargeBar = [];
+    chargeBarMaterials = [];
+    chargeBarTextures = [];
+    
+    for (var i = 0; i < 13; i++){
+        chargeBarTextures[i] = new THREE.TextureLoader().load('../../Assets/images/charge-bar/charge-bar-' + i + '.png');
+        chargeBarTextures[i].wrapS = THREE.RepeatWrapping;
+        chargeBarTextures[i].wrapT = THREE.RepeatWrapping;
+        chargeBarTextures[i].repeat.set(1, 1);
+
+        chargeBarMaterials[i] = new PhongMaterial({emissive: 0xFFFFFF});
+        chargeBarMaterials[i].map = chargeBarTextures[i];
+        chargeBarMaterials[i].transparent = true;
+        chargeBarMaterials[i].opacity = 0;
+        chargeBar[i] = new Mesh(this.chargeBarGeometry, chargeBarMaterials[i]);
+        chargeBar[i].name = "ChargeBar-" + i;
+        camera.add(chargeBar[i]);
+        chargeBar[i].position.set(0, -0.042, -0.2);
+    }
+    
+    chargeBarMaterials[0].opacity = 1;
+    chargeBarMaterials[1].opacity = 1;
 }
 
 function changeScene(): void {

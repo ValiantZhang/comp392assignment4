@@ -38,13 +38,6 @@ module scenes {
         private deathPlaneMaterial: Physijs.Material;
         private deathPlane: Physijs.Mesh;
         
-        //Charge Bar
-        private chargeBar: Mesh[];
-        private chargeBarGeometry: PlaneGeometry;
-        private chargeBarMaterials: PhongMaterial[];
-        private chargeBarTextures: Texture[];
-        private chargePower: number;
-        
         private directionLineMaterial: LineBasicMaterial;
         private directionLineGeometry: Geometry;
         private directionLine: Line;
@@ -54,11 +47,17 @@ module scenes {
         private clock: Clock;
 
         private stage: createjs.Stage;
-        //private scoreLabel: createjs.Text;
-        //private shotsLabel: createjs.Text;
         public scoreValue: number;
-        //private shotsValue: number;
         private creator :builder.Creator = new builder.Creator();
+        
+        private scoreRequired:number =7500; //Score required to pass the level
+        private levelTransitionInProgress:boolean = false;
+        private hands: Physijs.Mesh[];  
+      
+        
+        
+     
+        private rotationDirections:number[];
 
         
         /**
@@ -66,7 +65,6 @@ module scenes {
          */
         constructor() {
             super();
-
             this._initialize();
             this.start();
         }
@@ -95,7 +93,7 @@ module scenes {
             // Create to HTMLElements
             this.blocker = document.getElementById("blocker");
             this.instructions = document.getElementById("instructions");
-            this.blocker.style.display = "none";
+            this.blocker.style.display = "block";
 
             // setup canvas for menu scene
             this._setupCanvas();
@@ -112,9 +110,6 @@ module scenes {
             // Instantiate Game Controls
             this.keyboardControls = new objects.KeyboardControls();
             this.mouseControls = new objects.MouseControls();
-            
-            this.keyboardControls.enabled = true;
-            this.mouseControls.enabled = true;
         }
         /**
          * This method sets up the scoreboard for the scene
@@ -148,6 +143,16 @@ module scenes {
             scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(scoreLabel);
             console.log("Added Score Label to stage");
+            
+            levelGoal = new createjs.Text(
+                "Level goal: " + this.scoreRequired,
+                "40px Consolas",
+                "#ffffff"
+            );
+            levelGoal.x = config.Screen.WIDTH * 0.35;
+            levelGoal.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(levelGoal);
+            console.log("Added level goal to stage");
         }
 
         /**
@@ -196,23 +201,9 @@ module scenes {
          * @return void
          */
         private addGround(): void {
-            /*this.groundTexture = new THREE.TextureLoader().load('../../Assets/images/GravelCobble.jpg');
-            this.groundTexture.wrapS = THREE.RepeatWrapping;
-            this.groundTexture.wrapT = THREE.RepeatWrapping;
-            this.groundTexture.repeat.set(8, 8);
-
-            this.groundTextureNormal = new THREE.TextureLoader().load('../../Assets/images/GravelCobbleNormal.png');
-            this.groundTextureNormal.wrapS = THREE.RepeatWrapping;
-            this.groundTextureNormal.wrapT = THREE.RepeatWrapping;
-            this.groundTextureNormal.repeat.set(8, 8);*/
-
             this.groundMaterial = new PhongMaterial({ color: 0x00FF00 });
-            /*this.groundMaterial.map = this.groundTexture;
-            this.groundMaterial.bumpMap = this.groundText
-            this.groundMaterial.bumpScale = 0.2;*/
-
             this.groundGeometry = new BoxGeometry(128, 1, 128);
-            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0.8, 0);
+            this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0.4, 0.1);
             this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
             this.ground.receiveShadow = true;
             this.ground.name = "Ground";
@@ -252,22 +243,6 @@ module scenes {
         }
 
         /**
-         * Add the death plane to the scene
-         * 
-         * @method addDeathPlane
-         * @return void
-         */
-        /*private addDeathPlane(): void {
-            this.deathPlaneGeometry = new BoxGeometry(100, 1, 100);
-            this.deathPlaneMaterial = Physijs.createMaterial(new MeshBasicMaterial({ color: 0xff0000 }), 0.4, 0.6);
-
-            this.deathPlane = new Physijs.BoxMesh(this.deathPlaneGeometry, this.deathPlaneMaterial, 0);
-            this.deathPlane.position.set(0, -10, 0);
-            this.deathPlane.name = "DeathPlane";
-            this.add(this.deathPlane);
-        }*/
-        
-        /**
          * Adds the reticle to the camera
          * 
          * @method addReticle
@@ -290,79 +265,76 @@ module scenes {
             camera.add(this.reticle);
             this.reticle.position.set(0, 0.01, -0.2);
         }
+       
+       private createCubeSoldier(x:number, y:number, z:number):void{
+            var cubeMan: Physijs.BoxMesh;
+            var cubeBody:  Physijs.BoxMesh;
+            var cubeHand: Physijs.BoxMesh;
+           
+            cubeMan = new Physijs.BoxMesh( new THREE.CubeGeometry( 0.001, 0.001, 0.001 ), new THREE.MeshBasicMaterial({ color: 0x888888 }) ,0);
+            cubeBody =  new Physijs.BoxMesh( new THREE.CubeGeometry( 0.001, 0.001, 0.001 ), new THREE.MeshBasicMaterial({ color: 0x888888 }) ,0);
+            cubeHand= new Physijs.BoxMesh( new THREE.CubeGeometry( 0.001, 0.001, 0.001 ), new THREE.MeshBasicMaterial({ color: 0x888888 }) ,0);
+            
+            
+            //left leg
+            this.addBodyPart(1,0,0,0.3,0.7,0.2,0,cubeBody);// all values copied-past "as is" from Blender 
+            this.addBodyPart(1,-0.5,1.6,0.2,0.2,1.25,0,cubeBody);
+            this.addBodyPart(0.8,-0.5,4.2,0.2,0.2,1.25,-8,cubeBody);
+            //right leg
+            this.addBodyPart(-1,0,0,0.3,0.7,0.2,0,cubeBody);
+            this.addBodyPart(-1,-0.5,1.55,0.2,0.2,1.25,0,cubeBody);
+            this.addBodyPart(-1,-0.5,4.2,0.2,0.2,1.25,0,cubeBody);
+            //left hand
+            this.addBodyPart(1.8,-0.4,8,0.2,0.2,1,-60,cubeBody);
+            //hand - rotating part
+            this.addBodyPart(0.3,-0.34,1,0.2,0.2,1,13.6,cubeHand);
+            this.addBodyPart(0.8,-0.45,2.6,2.4,0.2,1.2,26.5,cubeHand);//SHIELD
+            cubeHand.position.set(2.5,7,2.5);
+            cubeHand.rotation.z=110 /180 * Math.PI;
+            //rotationDirection=1;
+            
+            //righ hand
+            this.addBodyPart(-3.3,-0.46,4.5,0.2,0.2,0.38,0,cubeBody);
+            this.addBodyPart(-3,-0.4,6,0.2,0.2,1,13.6,cubeBody);
+            this.addBodyPart(-2.1,-0.4,8,0.2,0.2,1,40.5,cubeBody);
+            //body, neck, head
+            this.addBodyPart(0,-0.3,5,1,0.4,0.2,0,cubeBody);
+            this.creator.createCube(x,6,z,1,this);//GOLDEN CUBE
+            this.addBodyPart(0,-0.3,8.5,1,0.4,0.2,0,cubeBody);
+            this.addBodyPart(0.0,-0.5,8.7,0.2,0.2,1,0,cubeBody);
+            this.addBodyPart(-0.1,-0.35,10,0.7,0.7,0.7,0,cubeBody);
+            
+            cubeMan.add(cubeHand);
+            this.hands.push(cubeHand);
+            cubeMan.add(cubeBody);
+            cubeMan.position.set(x,y,z);
+            this.add(cubeMan);
+       }
+       
+        private generateLevel() : void{
+           this.rotationDirections = [1,1,1];
+           this.hands = [];
+           
+           this.createCubeSoldier(-7,0,-15);
+           this.createCubeSoldier(0,0,-15);
+           this.createCubeSoldier(7,0,-15);
+          
+           
+         }
         
-        /**
-         * Adds the chargeBar to the camera
-         * 
-         * @method addChargeBar
-         * @return void
-         */
-        private addChargeBar(): void {
-            //ChargeBar Object
-            this.chargePower = 1.0;
-            this.chargeBarGeometry = new PlaneGeometry(0.03, 0.015);
-            this.chargeBar = [];
-            this.chargeBarMaterials = [];
-            this.chargeBarTextures = [];
-            
-            for (var i = 0; i < 13; i++){
-                this.chargeBarTextures[i] = new THREE.TextureLoader().load('../../Assets/images/charge-bar/charge-bar-' + i + '.png');
-                this.chargeBarTextures[i].wrapS = THREE.RepeatWrapping;
-                this.chargeBarTextures[i].wrapT = THREE.RepeatWrapping;
-                this.chargeBarTextures[i].repeat.set(1, 1);
-
-                this.chargeBarMaterials[i] = new PhongMaterial({emissive: 0xFFFFFF});
-                this.chargeBarMaterials[i].map = this.chargeBarTextures[i];
-                this.chargeBarMaterials[i].transparent = true;
-                this.chargeBarMaterials[i].opacity = 0;
-                this.chargeBar[i] = new Mesh(this.chargeBarGeometry, this.chargeBarMaterials[i]);
-                this.chargeBar[i].name = "ChargeBar-" + i;
-                camera.add(this.chargeBar[i]);
-                this.chargeBar[i].position.set(0, -0.042, -0.2);
-            }
-            
-            this.chargeBarMaterials[0].opacity = 1;
-            this.chargeBarMaterials[1].opacity = 1;
+        private addBodyPart(x:number,z:number,y:number,h:number,d:number,w:number,
+                            z_rotation:number,attachTo:Object3D):void{
+            var cubeMaterial = new LambertMaterial({color:0xFFffFF});
+            var cubePhysMaterial = Physijs.createMaterial(cubeMaterial,10,10)
+            var cubeGeometry = new BoxGeometry(h*1.8,w*1.8,d*1.8);
+            var thisCube = new Physijs.BoxMesh(cubeGeometry,cubeMaterial,0);
+            thisCube.position.set(x,y,z);
+            thisCube.rotation.z=-z_rotation /180 * Math.PI;
+            thisCube.castShadow = true;
+            thisCube.receiveShadow = true;
+            attachTo.add(thisCube);
         }
-       
-        private generateLevel():void{
-            
-            //Add platform for cubes to be set ontop of
-            this.creator.createPlatform(0, 1.5, -30, 7, 5, 3, 5, this);
-            
-            
-            //Create Golden Cubes
-            this.creator.createCube(-3, 6, -30, 1, this);
-            this.creator.createCube(-0, 6, -30, 1, this);
-            this.creator.createCube(2, 6, -30, 1, this);
-            
-            // Set Positions
-            var cubetangle1Pos = new Vector3(-3, 3, -30);
-            var cubetangle2Pos = new Vector3(0, 3, -30);
-            var cubetangle3Pos = new Vector3(3, 3, -30);
-            var cubetangle4Pos = new Vector3(0, 3, -28);
-            var cubetangle5Pos = new Vector3(0, 3, -32);
-            //var cubeamid1Pos = new Vector3(-3, 5, -31);
-            //var cubeamid2Pos = new Vector3(0, 5, -31);
-            //var cubeamid3Pos = new Vector3(3, 5, -33);
-            
-            // Instantiate Cubetangles
-            this.creator.createCubetangle(2, 2, 2, cubetangle1Pos, this);
-            this.creator.createCubetangle(2, 2, 2, cubetangle2Pos, this);
-            this.creator.createCubetangle(2, 2, 2, cubetangle3Pos, this);
-            this.creator.createCubetangle(4, 3, 2, cubetangle4Pos, this);
-            this.creator.createCubetangle(4, 3, 2, cubetangle5Pos, this);
-            
-            // Instantiate Cubeamids
-            //this.creator.createCubeamid(2, cubeamid1Pos, this);
-            //this.creator.createCubeamid(2, cubeamid2Pos, this);
-            //this.creator.createCubeamid(2, cubeamid3Pos, this);
-        }
-        
-
-       
-
-       
+    
         /**
          * Event Handler method for any pointerLockChange events
          * 
@@ -370,10 +342,10 @@ module scenes {
          * @return void
          */
         pointerLockChange(event): void {
-            //OMIT MOZ AND WEBKIT TO REMOVE SEMANTIC ERROR
-            if (document.pointerLockElement === this.element /*||
+            //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
+            if (document.pointerLockElement === this.element ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element*/){
+                document.webkitPointerLockElement === this.element){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
@@ -417,44 +389,34 @@ module scenes {
          * @method checkCharge
          * @return void
          */
-         private checkCharge(): void{
-             if (this.chargePower > 12) { this.chargePower = 12 };
+        private checkCharge(): void{
+             if (chargePower > 12) { chargePower = 12 };
              
-             for (var i = 2; i < this.chargeBar.length; i++){
-                 if (this.chargePower >= i) {
-                     this.chargeBarMaterials[i].opacity = 1;
+             for (var i = 2; i < chargeBar.length; i++){
+                 if (chargePower >= i) {
+                     chargeBarMaterials[i].opacity = 1;
                  }
                  else {
-                     this.chargeBarMaterials[i].opacity = 0;
+                     chargeBarMaterials[i].opacity = 0;
                  }
              }
          }
-         
-         private checkScore(): void{
-             if (scoreValue > 10000){
-             currentScene = currentScene + 1;
-             changeScene();
-             }
-         }
-         
-         /**
+        /**
          * This method creates and launches a sphere projectile
-         * 
-         * Projectile is create at player position
+         *  Projectile is create at player position
          * 
          * @method launchSphere
          * @return void
          */
-         private launchSphere(launchPower: number, launchAngle: number, launchYaw: number): void{
+        private launchSphere(launchPower: number, launchAngle: number, launchYaw: number): void{
+             //console.log( this.projectileQueue );
              if (shotsValue > 0){
                 this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z - 2, 
                 this, launchPower, launchAngle, launchYaw);
              }
          }
 
-
         // Check Controls Function
-
         /**
          * This method updates the player's position based on user input
          * 
@@ -470,28 +432,15 @@ module scenes {
                 
                 //ChargeBar
                 if (this.keyboardControls.charge){
-                    this.chargePower += 5 * delta;
+                    chargePower += 5 * delta;
                 }
-                else {
-                    if (this.chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
-                        this.launchSphere(this.chargePower * 5000, camera.rotation.x, camera.rotation.y);
+                else if(chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
+                        this.launchSphere(chargePower * 5000, camera.rotation.x, camera.rotation.y);
                         shotsValue--;
                         shotsLabel.text = "Shots: " + shotsValue;
-                        if (shotsValue <= 0) {
-                            setTimeout(() => {
-                                // Exit Pointer Lock
-                                document.exitPointerLock();
-                                this.children = []; // an attempt to clean up
-                                this.player.remove(camera);
-        
-                                // Play the Game Over Scene
-                                currentScene = config.Scene.OVER;
-                                changeScene();
-                            }, 5000);
-                        }
-                    this.chargePower = 0;
-                    }
+                        chargePower = 0;
                 }
+               
                 this.checkCharge();
                 this.cameraLook();
                 //reset Pitch and Yaw
@@ -499,17 +448,37 @@ module scenes {
                 this.mouseControls.yaw = 0;
                 this.prevTime = time;
             } 
-            // Controls Enabled ends
-            /*else {
-                this.player.setAngularVelocity(new Vector3(0, 0, 0));
-            }*/
+        }
+        private checkLevelChange():void{
+            if (shotsValue == 0 && !this.levelTransitionInProgress){
+                this.levelTransitionInProgress=true;
+                setTimeout(() => {
+                    if (scoreValue < this.scoreRequired){
+                        // Exit Pointer Lock
+                        document.exitPointerLock();
+                        this.children = []; // an attempt to clean up
+                        this.player.remove(camera);
+            
+                        // Play the Game Over Scene
+                        currentScene = config.Scene.OVER;
+                        changeScene();
+                    }
+                    else{
+                        document.exitPointerLock();
+                        this.children = []; // an attempt to clean up
+                        this.player.remove(camera);
+            
+                        //go to next level
+                        currentScene = config.Scene.MENU;;
+                        changeScene();
+                    }
+                }, 5000);
+            }
         }
 
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
-
         /**
          * The start method is the main method for the scene class
-         * 
          * @method start
          * @return void
          */
@@ -524,21 +493,15 @@ module scenes {
                 'mozPointerLockElement' in document ||
                 'webkitPointerLockElement' in document;
 
-
-
             // Check to see if we have pointerLock
             if (this.havePointerLock) {
                 this.element = document.body;
-
                 this.instructions.addEventListener('click', () => {
-
                     // Ask the user for pointer lock
                     console.log("Requesting PointerLock");
-
                     this.element.requestPointerLock = this.element.requestPointerLock ||
                         this.element.mozRequestPointerLock ||
                         this.element.webkitRequestPointerLock;
-
                     this.element.requestPointerLock();
                 });
 
@@ -553,16 +516,11 @@ module scenes {
             // Scene changes for Physijs
             this.name = "Main";
             this.fog = new THREE.Fog(0xffffff, 0, 750);
-            this.setGravity(new THREE.Vector3(0, -10, 0));
-
-            this.addEventListener('update', () => {
-                this.simulate(undefined, 2);
-            });
+            this.setGravity(new THREE.Vector3(0, -20, 0));
             
             // Add Ambient Light to the scene
             this.addAmbientLight();
            
-            
             // Add Directional Light to the scene
             this.addDirectionalLight();
 
@@ -572,32 +530,13 @@ module scenes {
             // Add player controller
             this.addPlayer();
 
-            
-            // Add death plane to the scene
-            //this.addDeathPlane();
-
-            // Collision Check
-
-
-            this.player.addEventListener('collision', function(eventObject) {
-                if (eventObject.name === "Ground") {
-                    this.isGrounded = true;
-                    createjs.Sound.play("land");
-                }
-                
-            }.bind(this));
-
             // create parent-child relationship with camera and player
             this.player.add(camera);
             //camera.position.set(0,10,35);//CONSTANT
             
             // Add UI Elements
             this.addReticle();
-            this.addChargeBar();
-            
-            
             this.generateLevel();
-
             this.simulate();
         }
 
@@ -625,10 +564,34 @@ module scenes {
          * @method update
          * @returns void
          */
+         
+        private handsContoller(h:number):void{
+             this.hands[h].rotation.z+=this.rotationDirections[h]*0.01*(1+h);
+             this.hands[h].__dirtyRotation = true;
+           // cubeHand.__dirtyRotation = true;
+            if(this.hands[h].rotation.z < 30/180 * Math.PI){
+                this.rotationDirections[h]=-this.rotationDirections[h];
+                
+            }
+            if(this.hands[h].rotation.z > 180/180 * Math.PI){
+                this.rotationDirections[h]=-this.rotationDirections[h];
+            }
+            
+        }
+            
+         
         public update(): void {
+            //player.setAngularFactor(new Vector3(0,0,0));
             this.checkControls();
-            this.checkScore();
             this.stage.update();
+            this.checkLevelChange();
+            this.simulate();
+           
+           this.handsContoller(0);
+            this.handsContoller(1);
+             this.handsContoller(2);
+           
+            
         }
 
         /**

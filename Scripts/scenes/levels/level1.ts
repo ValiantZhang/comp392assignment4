@@ -38,13 +38,6 @@ module scenes {
         private deathPlaneMaterial: Physijs.Material;
         private deathPlane: Physijs.Mesh;
         
-        //Charge Bar
-        private chargeBar: Mesh[];
-        private chargeBarGeometry: PlaneGeometry;
-        private chargeBarMaterials: PhongMaterial[];
-        private chargeBarTextures: Texture[];
-        private chargePower: number;
-        
         private directionLineMaterial: LineBasicMaterial;
         private directionLineGeometry: Geometry;
         private directionLine: Line;
@@ -54,11 +47,11 @@ module scenes {
         private clock: Clock;
 
         private stage: createjs.Stage;
-        //private scoreLabel: createjs.Text;
-        //private shotsLabel: createjs.Text;
         public scoreValue: number;
-        //private shotsValue: number;
         private creator :builder.Creator = new builder.Creator();
+        
+        private scoreRequired:number =7500; //Score required to pass the level
+        private levelTransitionInProgress:boolean=false;
 
         
         /**
@@ -66,7 +59,6 @@ module scenes {
          */
         constructor() {
             super();
-
             this._initialize();
             this.start();
         }
@@ -145,6 +137,16 @@ module scenes {
             scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(scoreLabel);
             console.log("Added Score Label to stage");
+            
+            levelGoal = new createjs.Text(
+                "Level goal: " + this.scoreRequired,
+                "40px Consolas",
+                "#ffffff"
+            );
+            levelGoal.x = config.Screen.WIDTH * 0.35;
+            levelGoal.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(levelGoal);
+            console.log("Added level goal to stage");
         }
 
         /**
@@ -271,40 +273,6 @@ module scenes {
             camera.add(this.reticle);
             this.reticle.position.set(0, 0.01, -0.2);
         }
-        
-        /**
-         * Adds the chargeBar to the camera
-         * 
-         * @method addChargeBar
-         * @return void
-         */
-        private addChargeBar(): void {
-            //ChargeBar Object
-            this.chargePower = 1.0;
-            this.chargeBarGeometry = new PlaneGeometry(0.03, 0.015);
-            this.chargeBar = [];
-            this.chargeBarMaterials = [];
-            this.chargeBarTextures = [];
-            
-            for (var i = 0; i < 13; i++){
-                this.chargeBarTextures[i] = new THREE.TextureLoader().load('../../Assets/images/charge-bar/charge-bar-' + i + '.png');
-                this.chargeBarTextures[i].wrapS = THREE.RepeatWrapping;
-                this.chargeBarTextures[i].wrapT = THREE.RepeatWrapping;
-                this.chargeBarTextures[i].repeat.set(1, 1);
-
-                this.chargeBarMaterials[i] = new PhongMaterial({emissive: 0xFFFFFF});
-                this.chargeBarMaterials[i].map = this.chargeBarTextures[i];
-                this.chargeBarMaterials[i].transparent = true;
-                this.chargeBarMaterials[i].opacity = 0;
-                this.chargeBar[i] = new Mesh(this.chargeBarGeometry, this.chargeBarMaterials[i]);
-                this.chargeBar[i].name = "ChargeBar-" + i;
-                camera.add(this.chargeBar[i]);
-                this.chargeBar[i].position.set(0, -0.042, -0.2);
-            }
-            
-            this.chargeBarMaterials[0].opacity = 1;
-            this.chargeBarMaterials[1].opacity = 1;
-        }
        
         private generateLevel():void{
             //Create Golden Cubes
@@ -339,13 +307,14 @@ module scenes {
          */
         pointerLockChange(event): void {
             //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
-            if (document.pointerLockElement === this.element /*||
+            if (document.pointerLockElement === this.element ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element*/){
+                document.webkitPointerLockElement === this.element){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
                 this.blocker.style.display = 'none';
+                console.log("PointerLock enabled");
             } else {
                 // disable our mouse and keyboard controls
                 if (currentScene == 5) {
@@ -386,24 +355,21 @@ module scenes {
          * @return void
          */
          private checkCharge(): void{
-             if (this.chargePower > 12) { this.chargePower = 12 };
+             if (chargePower > 12) { chargePower = 12 };
              
-             for (var i = 2; i < this.chargeBar.length; i++){
-                 if (this.chargePower >= i) {
-                     this.chargeBarMaterials[i].opacity = 1;
+             for (var i = 2; i < chargeBar.length; i++){
+                 if (chargePower >= i) {
+                     chargeBarMaterials[i].opacity = 1;
                  }
                  else {
-                     this.chargeBarMaterials[i].opacity = 0;
+                     chargeBarMaterials[i].opacity = 0;
                  }
              }
          }
          
-         private checkScore(): void{
-             if (scoreValue > 1000){
-             currentScene = currentScene + 1;
-             changeScene();
-             }
-         }
+       
+           
+        
          
          /**
          * This method creates and launches a sphere projectile
@@ -414,6 +380,7 @@ module scenes {
          * @return void
          */
          private launchSphere(launchPower: number, launchAngle: number, launchYaw: number): void{
+             //console.log( this.projectileQueue );
              if (shotsValue > 0){
                 this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z - 2, 
                 this, launchPower, launchAngle, launchYaw);
@@ -436,28 +403,15 @@ module scenes {
                 
                 //ChargeBar
                 if (this.keyboardControls.charge){
-                    this.chargePower += 5 * delta;
+                    chargePower += 5 * delta;
                 }
-                else {
-                    if (this.chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
-                        this.launchSphere(this.chargePower * 5000, camera.rotation.x, camera.rotation.y);
+                else if(chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
+                        this.launchSphere(chargePower * 5000, camera.rotation.x, camera.rotation.y);
                         shotsValue--;
                         shotsLabel.text = "Shots: " + shotsValue;
-                        if (shotsValue <= 0) {
-                            setTimeout(() => {
-                                // Exit Pointer Lock
-                                document.exitPointerLock();
-                                this.children = []; // an attempt to clean up
-                                this.player.remove(camera);
-        
-                                // Play the Game Over Scene
-                                currentScene = config.Scene.OVER;
-                                changeScene();
-                            }, 5000);
-                        }
-                    this.chargePower = 0;
-                    }
+                        chargePower = 0;
                 }
+               
                 this.checkCharge();
                 this.cameraLook();
                 //reset Pitch and Yaw
@@ -465,10 +419,32 @@ module scenes {
                 this.mouseControls.yaw = 0;
                 this.prevTime = time;
             } 
-            // Controls Enabled ends
-            /*else {
-                this.player.setAngularVelocity(new Vector3(0, 0, 0));
-            }*/
+        }
+        private checkLevelChange():void{
+            if (shotsValue == 0 && !this.levelTransitionInProgress){
+                this.levelTransitionInProgress=true;
+                setTimeout(() => {
+                    if (scoreValue < this.scoreRequired){
+                        // Exit Pointer Lock
+                        document.exitPointerLock();
+                        this.children = []; // an attempt to clean up
+                        this.player.remove(camera);
+            
+                        // Play the Game Over Scene
+                        currentScene = config.Scene.OVER;
+                        changeScene();
+                    }
+                    else{
+                        document.exitPointerLock();
+                        this.children = []; // an attempt to clean up
+                        this.player.remove(camera);
+            
+                        //go to next level
+                        currentScene = currentScene + 1;
+                        changeScene();
+                    }
+                }, 5000);
+            }
         }
 
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
@@ -512,10 +488,6 @@ module scenes {
             this.name = "Main";
             this.fog = new THREE.Fog(0xffffff, 0, 750);
             this.setGravity(new THREE.Vector3(0, -20, 0));
-
-          //  this.addEventListener('update', () => {
-             //   this.simulate();
-            //});
             
             // Add Ambient Light to the scene
             this.addAmbientLight();
@@ -530,12 +502,13 @@ module scenes {
             this.addPlayer();
 
             // Collision Check
-            this.player.addEventListener('collision', function(eventObject) {
+            /*this.player.addEventListener('collision', function(eventObject) {
                 if (eventObject.name === "Ground") {
                     this.isGrounded = true;
                     createjs.Sound.play("land");
                 }
             }.bind(this));
+            */
 
             // create parent-child relationship with camera and player
             this.player.add(camera);
@@ -543,11 +516,8 @@ module scenes {
             
             // Add UI Elements
             this.addReticle();
-            this.addChargeBar();
             this.generateLevel();
-            
-             this.simulate();
-            
+            this.simulate();
         }
 
         /**
@@ -578,7 +548,7 @@ module scenes {
             //player.setAngularFactor(new Vector3(0,0,0));
             this.checkControls();
             this.stage.update();
-            this.checkScore();
+            this.checkLevelChange();
             this.simulate();
         }
 

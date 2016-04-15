@@ -103,6 +103,7 @@ var scenes;
                 this._buttons[i].on("mouseover", function (event) {
                     event.target.scaleX = 0.28;
                     event.target.scaleY = 0.28;
+                    event.target.cursor = "pointer";
                 });
                 this._buttons[i].on("mouseout", function (event) {
                     event.target.scaleX = 0.25;

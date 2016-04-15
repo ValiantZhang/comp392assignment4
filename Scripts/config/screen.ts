@@ -11,7 +11,6 @@ module config {
         public static LEVEL1: number = 1;
         public static LEVEL2: number = 2;
         public static LEVEL3: number = 3;
-        public static PLAY: number = 4;
         public static OVER: number = 5;
     }
     

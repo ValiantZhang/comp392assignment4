@@ -19,8 +19,8 @@ module scenes {
         private _logo: createjs.Bitmap;
         private _startButton: createjs.Bitmap;
         private _tutorialButton: createjs.Bitmap;
-        private _level1Button: createjs.Bitmap;
-        private _level2Button: createjs.Bitmap;
+        private _playButton: createjs.Bitmap;
+        private _quitButton: createjs.Bitmap;
         private _level3Button: createjs.Bitmap;
         private _buttons: createjs.Bitmap[];
         
@@ -74,27 +74,7 @@ module scenes {
          * @return void
          */
         public start(): void {
-            /*
-            this._startButton = new createjs.Bitmap(assets.getResult("StartButton"));
-            this._startButton.regX = this._startButton.getBounds().width * 0.5;
-            this._startButton.regY = this._startButton.getBounds().height * 0.5;
-            this._startButton.x = config.Screen.WIDTH * 0.5;
-            this._startButton.y = (config.Screen.HEIGHT * 0.5) + 100;
-            this._stage.addChild(this._startButton);
 
-            this._startButton.on("mouseover", (event: createjs.MouseEvent) => {
-                event.target.alpha = 0.7;
-            });
-
-            this._startButton.on("mouseout", (event: createjs.MouseEvent) => {
-                event.target.alpha = 1.0;
-            });
-
-            this._startButton.on("click", (event: createjs.MouseEvent) => {
-                currentScene = config.Scene.PLAY;
-                changeScene();
-            });*/
-            
             this._logo = new createjs.Bitmap(assets.getResult("Logo"));
             this._logo.scaleX = 0.7;
             this._logo.scaleY = 0.7;
@@ -114,36 +94,35 @@ module scenes {
             this._stage.addChild(this._tutorialButton);
             
             this._tutorialButton.on("click", (event: createjs.MouseEvent) => {
-                currentScene = config.Scene.PLAY;
-                changeScene();
-            });
-            
-            this._level1Button = new createjs.Bitmap(assets.getResult("Level1Button"));
-            this._level1Button.scaleX = 0.25;
-            this._level1Button.scaleY = 0.25;
-            this._level1Button.regX = this._level1Button.getBounds().width * 0.5;
-            this._level1Button.regY = this._level1Button.getBounds().height * 0.5;
-            this._level1Button.x = config.Screen.WIDTH * 0.5;
-            this._level1Button.y = (config.Screen.HEIGHT * 0.55) + 100;
-            this._stage.addChild(this._level1Button);
-            
-            this._level1Button.on("click", (event: createjs.MouseEvent) => {
                 currentScene = config.Scene.LEVEL1;
                 changeScene();
             });
             
-            /*this._level2Button = new createjs.Bitmap(assets.getResult("Level2Button"));
-            this._level2Button.scaleX = 0.25;
-            this._level2Button.scaleY = 0.25;
-            this._level2Button.regX = this._level2Button.getBounds().width * 0.5;
-            this._level2Button.regY = this._level2Button.getBounds().height * 0.5;
-            this._level2Button.x = config.Screen.WIDTH * 0.5;
-            this._level2Button.y = (config.Screen.HEIGHT * 0.65) + 100;
-            this._stage.addChild(this._level2Button);
+            this._playButton = new createjs.Bitmap(assets.getResult("play"));
+            this._playButton.scaleX = 0.25;
+            this._playButton.scaleY = 0.25;
+            this._playButton.regX = this._playButton.getBounds().width * 0.5;
+            this._playButton.regY = this._playButton.getBounds().height * 0.5;
+            this._playButton.x = config.Screen.WIDTH * 0.5;
+            this._playButton.y = (config.Screen.HEIGHT * 0.55) + 100;
+            this._stage.addChild(this._playButton);
             
-            this._level2Button.on("click", (event: createjs.MouseEvent) => {
-                currentScene = config.Scene.LEVEL2;
+            this._playButton.on("click", (event: createjs.MouseEvent) => {
+                currentScene = config.Scene.LEVEL1;
                 changeScene();
+            });
+            
+            this._quitButton = new createjs.Bitmap(assets.getResult("exit"));
+            this._quitButton.scaleX = 0.25;
+            this._quitButton.scaleY = 0.25;
+            this._quitButton.regX = this._quitButton.getBounds().width * 0.5;
+            this._quitButton.regY = this._quitButton.getBounds().height * 0.5;
+            this._quitButton.x = config.Screen.WIDTH * 0.5;
+            this._quitButton.y = (config.Screen.HEIGHT * 0.65) + 100;
+            this._stage.addChild(this._quitButton);
+            
+            this._quitButton.on("click", (event: createjs.MouseEvent) => {
+                window.close();
             });
             
             this._level3Button = new createjs.Bitmap(assets.getResult("Level3Button"));
@@ -158,21 +137,22 @@ module scenes {
             this._level3Button.on("click", (event: createjs.MouseEvent) => {
                 currentScene = config.Scene.LEVEL3;
                 changeScene();
-            });*/
+            });
             
             // Add buttons to an array for hover events
             this._buttons = [];
             
             this._buttons[0] = this._tutorialButton;
-            this._buttons[1] = this._level1Button;
-            /*this._buttons[2] = this._level2Button;
-            this._buttons[3] = this._level3Button;*/
+            this._buttons[1] = this._playButton;
+            this._buttons[2] = this._quitButton;
+            //this._buttons[3] = this._level3Button;
             
             // Loop through buttons
             for (var i = 0; i < this._buttons.length; i++){
                 this._buttons[i].on("mouseover", (event: createjs.MouseEvent) => {
                     event.target.scaleX = 0.28;
                     event.target.scaleY = 0.28;
+                    event.target.cursor = "pointer";
                 });
     
                 this._buttons[i].on("mouseout", (event: createjs.MouseEvent) => {
@@ -180,7 +160,7 @@ module scenes {
                     event.target.scaleY = 0.25;
                 });
                 
-                /*this._buttons[i].on("mousedown", (event: createjs.MouseEvent) => {
+                this._buttons[i].on("mousedown", (event: createjs.MouseEvent) => {
                     event.target.scaleX = 0.26;
                     event.target.scaleY = 0.26;
                 });
@@ -188,11 +168,8 @@ module scenes {
                 this._buttons[i].on("click", (event: createjs.MouseEvent) => {
                     event.target.scaleX = 0.28;
                     event.target.scaleY = 0.28;
-                });*/
+                });
             }
-            
-            
-            
         }
 
         /**

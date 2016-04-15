@@ -90,24 +90,67 @@ var builder;
             if (launchYaw === void 0) { launchYaw = 1; }
             var projectileGeometry = new SphereGeometry(1, 15, 15);
             var projectileName = "Shot";
-            var basicProjectileMaterial = new LambertMaterial({ color: 0x000000 });
-            var projectilePhysMaterial = Physijs.createMaterial(basicProjectileMaterial, 0.9, 0.01);
+            var basicProjectileMaterial = new LambertMaterial({ color: 0x464646 });
+            var projectilePhysMaterial = Physijs.createMaterial(basicProjectileMaterial, 0.9, 0.2);
             var rogueSphere = new Physijs.SphereMesh(projectileGeometry, projectilePhysMaterial, 1000);
             rogueSphere.position.set(posX, posY, posZ);
+            createjs.Sound.play("projectileFlight");
             rogueSphere.name = projectileName;
+            rogueSphere.setCcdMotionThreshold(0.1);
+            rogueSphere.setCcdSweptSphereRadius(0.2);
             attachTo.add(rogueSphere);
-            rogueSphere.applyCentralImpulse(new Vector3(-launchYaw * launchPower, launchAngle * launchPower, -launchPower));
             rogueSphere.addEventListener('collision', function (object) {
+                console.log("I hit" + object.name);
                 if (object.name === "standard") {
                     scoreValue += 100;
                     scoreLabel.text = "SCORE: " + scoreValue;
+                    object.material.color = 0x464646;
+                    object.name = "standard_hitted";
                 }
                 if (object.name === "golden") {
                     scoreValue += 2500;
                     scoreLabel.text = "SCORE: " + scoreValue;
+                    object.material.color = 0xFF0000;
+                    object.name = "golden_hitted";
                 }
             });
+            rogueSphere.applyCentralImpulse(new Vector3(-launchYaw * launchPower * 1.1, launchAngle * launchPower, -launchPower));
         };
+        ;
+        Creator.prototype.createProjectileInQueue = function (posX, posY, posZ, attachTo, name) {
+            var projectileGeometry = new SphereGeometry(1, 15, 15);
+            var basicProjectileMaterial = new LambertMaterial({ color: 0x464646 });
+            var projectilePhysMaterial = Physijs.createMaterial(basicProjectileMaterial, 0.9, 0.01);
+            var rogueSphere = new Physijs.SphereMesh(projectileGeometry, projectilePhysMaterial, 1000);
+            rogueSphere.position.set(posX, posY, posZ);
+            rogueSphere.name = name;
+            rogueSphere.setCcdMotionThreshold(0.1);
+            rogueSphere.setCcdSweptSphereRadius(0.2);
+            rogueSphere.addEventListener('collision', function (object) {
+                console.log("I hit" + object.name);
+                if (object.name === "standard") {
+                    scoreValue += 100;
+                    scoreLabel.text = "SCORE: " + scoreValue;
+                    object.material.color = 0x464646;
+                    object.name = "standard_hitted";
+                }
+                if (object.name === "golden") {
+                    scoreValue += 2500;
+                    scoreLabel.text = "SCORE: " + scoreValue;
+                    object.material.color = 0xFF0000;
+                    object.name = "golden_hitted";
+                }
+            });
+            attachTo.add(rogueSphere);
+            return rogueSphere;
+        };
+        ;
+        Creator.prototype.shootProjectile = function (posX, posY, posZ, launchPower, launchAngle, launchYaw, rogueSphere) {
+            rogueSphere.position.set(posX, posY, posZ);
+            rogueSphere.__dirtyPosition = true;
+            rogueSphere.applyCentralImpulse(new Vector3(-launchYaw * launchPower, launchAngle * launchPower, -launchPower));
+        };
+        ;
         //LEVEL 2 ASSETS
         /**
         *
@@ -124,7 +167,7 @@ var builder;
             var platformGeometry = new CylinderGeometry(radiusTop, radiusBottom, height, edges);
             var platformName = "Platform";
             var basicCylinderMaterial;
-            basicCylinderMaterial = new LambertMaterial({ color: 0xFF0000 });
+            basicCylinderMaterial = new LambertMaterial({ color: 0x0000FF });
             var platformPhysMaterial = Physijs.createMaterial(basicCylinderMaterial, 0.8, 0.1);
             var platform = new Physijs.CylinderMesh(platformGeometry, platformPhysMaterial, 0);
             platform.position.set(posX, posY, posZ);

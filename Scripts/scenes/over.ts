@@ -120,6 +120,7 @@ module scenes {
                 this._buttons[i].on("mouseover", (event: createjs.MouseEvent) => {
                     event.target.scaleX = 0.28;
                     event.target.scaleY = 0.28;
+                    event.target.cursor = "pointer";
                 });
     
                 this._buttons[i].on("mouseout", (event: createjs.MouseEvent) => {

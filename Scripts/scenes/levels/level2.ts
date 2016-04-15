@@ -54,11 +54,11 @@ module scenes {
         private clock: Clock;
 
         private stage: createjs.Stage;
-        //private scoreLabel: createjs.Text;
-        //private shotsLabel: createjs.Text;
         public scoreValue: number;
-        //private shotsValue: number;
         private creator :builder.Creator = new builder.Creator();
+        
+        private scoreRequired:number =2500; //Score required to pass the level
+        private levelTransitionInProgress:boolean=false;
 
         
         /**
@@ -148,6 +148,16 @@ module scenes {
             scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(scoreLabel);
             console.log("Added Score Label to stage");
+            
+            levelGoal = new createjs.Text(
+                "Level goal: " + this.scoreRequired,
+                "40px Consolas",
+                "#ffffff"
+            );
+            levelGoal.x = config.Screen.WIDTH * 0.35;
+            levelGoal.y = (config.Screen.HEIGHT * 0.15) * 0.20;
+            this.stage.addChild(levelGoal);
+            console.log("Added level goal to stage");
         }
 
         /**
@@ -251,21 +261,6 @@ module scenes {
             //console.log("Added Player to Scene");
         }
 
-        /**
-         * Add the death plane to the scene
-         * 
-         * @method addDeathPlane
-         * @return void
-         */
-        /*private addDeathPlane(): void {
-            this.deathPlaneGeometry = new BoxGeometry(100, 1, 100);
-            this.deathPlaneMaterial = Physijs.createMaterial(new MeshBasicMaterial({ color: 0xff0000 }), 0.4, 0.6);
-
-            this.deathPlane = new Physijs.BoxMesh(this.deathPlaneGeometry, this.deathPlaneMaterial, 0);
-            this.deathPlane.position.set(0, -10, 0);
-            this.deathPlane.name = "DeathPlane";
-            this.add(this.deathPlane);
-        }*/
         
         /**
          * Adds the reticle to the camera
@@ -290,46 +285,11 @@ module scenes {
             camera.add(this.reticle);
             this.reticle.position.set(0, 0.01, -0.2);
         }
-        
-        /**
-         * Adds the chargeBar to the camera
-         * 
-         * @method addChargeBar
-         * @return void
-         */
-        private addChargeBar(): void {
-            //ChargeBar Object
-            this.chargePower = 1.0;
-            this.chargeBarGeometry = new PlaneGeometry(0.03, 0.015);
-            this.chargeBar = [];
-            this.chargeBarMaterials = [];
-            this.chargeBarTextures = [];
-            
-            for (var i = 0; i < 13; i++){
-                this.chargeBarTextures[i] = new THREE.TextureLoader().load('../../Assets/images/charge-bar/charge-bar-' + i + '.png');
-                this.chargeBarTextures[i].wrapS = THREE.RepeatWrapping;
-                this.chargeBarTextures[i].wrapT = THREE.RepeatWrapping;
-                this.chargeBarTextures[i].repeat.set(1, 1);
-
-                this.chargeBarMaterials[i] = new PhongMaterial({emissive: 0xFFFFFF});
-                this.chargeBarMaterials[i].map = this.chargeBarTextures[i];
-                this.chargeBarMaterials[i].transparent = true;
-                this.chargeBarMaterials[i].opacity = 0;
-                this.chargeBar[i] = new Mesh(this.chargeBarGeometry, this.chargeBarMaterials[i]);
-                this.chargeBar[i].name = "ChargeBar-" + i;
-                camera.add(this.chargeBar[i]);
-                this.chargeBar[i].position.set(0, -0.042, -0.2);
-            }
-            
-            this.chargeBarMaterials[0].opacity = 1;
-            this.chargeBarMaterials[1].opacity = 1;
-        }
        
         private generateLevel():void{
             
             //Add platform for cubes to be set ontop of
             this.creator.createPlatform(0, 1.5, -30, 7, 5, 3, 5, this);
-            
             
             //Create Golden Cubes
             this.creator.createCube(-3, 6, -30, 1, this);
@@ -342,26 +302,14 @@ module scenes {
             var cubetangle3Pos = new Vector3(3, 3, -30);
             var cubetangle4Pos = new Vector3(0, 3, -28);
             var cubetangle5Pos = new Vector3(0, 3, -32);
-            //var cubeamid1Pos = new Vector3(-3, 5, -31);
-            //var cubeamid2Pos = new Vector3(0, 5, -31);
-            //var cubeamid3Pos = new Vector3(3, 5, -33);
-            
+
             // Instantiate Cubetangles
             this.creator.createCubetangle(2, 2, 2, cubetangle1Pos, this);
             this.creator.createCubetangle(2, 2, 2, cubetangle2Pos, this);
             this.creator.createCubetangle(2, 2, 2, cubetangle3Pos, this);
             this.creator.createCubetangle(4, 3, 2, cubetangle4Pos, this);
             this.creator.createCubetangle(4, 3, 2, cubetangle5Pos, this);
-            
-            // Instantiate Cubeamids
-            //this.creator.createCubeamid(2, cubeamid1Pos, this);
-            //this.creator.createCubeamid(2, cubeamid2Pos, this);
-            //this.creator.createCubeamid(2, cubeamid3Pos, this);
         }
-        
-
-       
-
        
         /**
          * Event Handler method for any pointerLockChange events
@@ -371,9 +319,9 @@ module scenes {
          */
         pointerLockChange(event): void {
             //OMIT MOZ AND WEBKIT TO REMOVE SEMANTIC ERROR
-            if (document.pointerLockElement === this.element /*||
+            if (document.pointerLockElement === this.element ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element*/){
+                document.webkitPointerLockElement === this.element){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
@@ -418,22 +366,15 @@ module scenes {
          * @return void
          */
          private checkCharge(): void{
-             if (this.chargePower > 12) { this.chargePower = 12 };
+             if (chargePower > 12) { chargePower = 12 };
              
-             for (var i = 2; i < this.chargeBar.length; i++){
-                 if (this.chargePower >= i) {
-                     this.chargeBarMaterials[i].opacity = 1;
+             for (var i = 2; i < chargeBar.length; i++){
+                 if (chargePower >= i) {
+                     chargeBarMaterials[i].opacity = 1;
                  }
                  else {
-                     this.chargeBarMaterials[i].opacity = 0;
+                     chargeBarMaterials[i].opacity = 0;
                  }
-             }
-         }
-         
-         private checkScore(): void{
-             if (scoreValue > 3000){
-             currentScene = currentScene + 1;
-             changeScene();
              }
          }
          
@@ -452,9 +393,6 @@ module scenes {
              }
          }
 
-
-        // Check Controls Function
-
         /**
          * This method updates the player's position based on user input
          * 
@@ -470,28 +408,15 @@ module scenes {
                 
                 //ChargeBar
                 if (this.keyboardControls.charge){
-                    this.chargePower += 5 * delta;
+                    chargePower += 5 * delta;
                 }
-                else {
-                    if (this.chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
-                        this.launchSphere(this.chargePower * 5000, camera.rotation.x, camera.rotation.y);
+                else if(chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
+                        this.launchSphere(chargePower * 5000, camera.rotation.x, camera.rotation.y);
                         shotsValue--;
                         shotsLabel.text = "Shots: " + shotsValue;
-                        if (shotsValue <= 0) {
-                            setTimeout(() => {
-                                // Exit Pointer Lock
-                                document.exitPointerLock();
-                                this.children = []; // an attempt to clean up
-                                this.player.remove(camera);
-        
-                                // Play the Game Over Scene
-                                currentScene = config.Scene.OVER;
-                                changeScene();
-                            }, 5000);
-                        }
-                    this.chargePower = 0;
-                    }
+                        chargePower = 0;
                 }
+               
                 this.checkCharge();
                 this.cameraLook();
                 //reset Pitch and Yaw
@@ -499,10 +424,32 @@ module scenes {
                 this.mouseControls.yaw = 0;
                 this.prevTime = time;
             } 
-            // Controls Enabled ends
-            /*else {
-                this.player.setAngularVelocity(new Vector3(0, 0, 0));
-            }*/
+        }
+        private checkLevelChange():void{
+            if (shotsValue == 0 && !this.levelTransitionInProgress){
+                this.levelTransitionInProgress=true;
+                setTimeout(() => {
+                    if (scoreValue < this.scoreRequired){
+                        // Exit Pointer Lock
+                        document.exitPointerLock();
+                        this.children = []; // an attempt to clean up
+                        this.player.remove(camera);
+            
+                        // Play the Game Over Scene
+                        currentScene = config.Scene.OVER;
+                        changeScene();
+                    }
+                    else{
+                        document.exitPointerLock();
+                        this.children = []; // an attempt to clean up
+                        this.player.remove(camera);
+            
+                        //go to next level
+                        currentScene = currentScene + 1;
+                        changeScene();
+                    }
+                }, 5000);
+            }
         }
 
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
@@ -515,6 +462,8 @@ module scenes {
          */
         public start(): void {
             var self = this;
+            shotsValue=5;
+            shotsLabel.text="Shots:" + shotsValue;
 
             // Set Up Scoreboard
             this.setupScoreboard();
@@ -553,11 +502,7 @@ module scenes {
             // Scene changes for Physijs
             this.name = "Main";
             this.fog = new THREE.Fog(0xffffff, 0, 750);
-            this.setGravity(new THREE.Vector3(0, -10, 0));
-
-            this.addEventListener('update', () => {
-                this.simulate(undefined, 2);
-            });
+            this.setGravity(new THREE.Vector3(0, -20, 0));
             
             // Add Ambient Light to the scene
             this.addAmbientLight();
@@ -572,33 +517,16 @@ module scenes {
             // Add player controller
             this.addPlayer();
 
-            
-            // Add death plane to the scene
-            //this.addDeathPlane();
-
             // Collision Check
-
-
-            this.player.addEventListener('collision', function(eventObject) {
-                if (eventObject.name === "Ground") {
-                    this.isGrounded = true;
-                    createjs.Sound.play("land");
-                }
-                
-            }.bind(this));
-
+           
             // create parent-child relationship with camera and player
             this.player.add(camera);
             //camera.position.set(0,10,35);//CONSTANT
             
             // Add UI Elements
             this.addReticle();
-            this.addChargeBar();
-            
-            
             this.generateLevel();
-
-            this.simulate();
+            this.simulate(); 
         }
 
         /**
@@ -627,8 +555,9 @@ module scenes {
          */
         public update(): void {
             this.checkControls();
-            this.checkScore();
             this.stage.update();
+            this.checkLevelChange();
+            this.simulate();
         }
 
         /**
