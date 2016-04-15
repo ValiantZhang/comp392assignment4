@@ -62,6 +62,9 @@ var manifest = [
     // Sounds
     { id: "bgSound", src: "../../Assets/audio/soundTrack.mp3" },
     { id: "projectileFlight", src: "../../Assets/audio/projectileInFlyM.mp3" },
+    { id: "standardHit", src: "../../Assets/audio/StandardHit.wav" },
+    { id: "goldenHit", src: "../../Assets/audio/GoldenHit.wav" },
+    { id: "lvlChng", src: "../../Assets/audio/LevelChangeAlert.wav" },
     // Images
     { id: "StartButton", src: "../../Assets/images/StartButton.png" },
     { id: "TutorialButton", src: "../../Assets/images/tutorial.png" },
@@ -211,6 +214,7 @@ function changeScene() {
             console.log("Starting OVER Scene");
             break;
     }
+    createjs.Sound.play("lvlChng");
 }
 window.onload = preload;
 

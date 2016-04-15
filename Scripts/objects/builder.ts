@@ -142,12 +142,14 @@ module builder {
             rogueSphere.addEventListener('collision', (object) => {
                 console.log("I hit"+object.name);
                 if (object.name === "standard") {
+                    createjs.Sound.play("standardHit");
                     scoreValue += 100;
                     scoreLabel.text = "SCORE: " + scoreValue;
                     object.material.color= 0x464646;
                     object.name="standard_hitted";
                 }
                 if (object.name === "golden") {
+                    createjs.Sound.play("goldenHit");
                     scoreValue += 2500;
                     scoreLabel.text = "SCORE: " + scoreValue;
                     object.material.color = 0xFF0000;
