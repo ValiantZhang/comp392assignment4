@@ -1,3 +1,9 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        KeyboardControls Class
+Revision History:   Live build - Part 4 (final)
+*/
 var objects;
 (function (objects) {
     // KeyboardControls Class +++++++++++++++

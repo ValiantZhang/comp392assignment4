@@ -15,7 +15,7 @@ module scenes {
         private _stage: createjs.Stage;
         private _tutorial: createjs.Bitmap;
         private _playButton: createjs.Bitmap;
-        private _quitButton: createjs.Bitmap;
+        private _menuButton: createjs.Bitmap;
         private _buttons: createjs.Bitmap[];
         
 
@@ -75,7 +75,7 @@ module scenes {
             this._tutorial.regX = this._tutorial.getBounds().width * 0.5;
             this._tutorial.regY = this._tutorial.getBounds().height * 0.5;
             this._tutorial.x = config.Screen.WIDTH * 0.5;
-            this._tutorial.y = (config.Screen.HEIGHT * 0.15) + 100;
+            this._tutorial.y = (config.Screen.HEIGHT * 0.20) + 100;
             this._stage.addChild(this._tutorial);
             
             this._playButton = new createjs.Bitmap(assets.getResult("play"));
@@ -84,7 +84,7 @@ module scenes {
             this._playButton.regX = this._playButton.getBounds().width * 0.5;
             this._playButton.regY = this._playButton.getBounds().height * 0.5;
             this._playButton.x = config.Screen.WIDTH * 0.5;
-            this._playButton.y = (config.Screen.HEIGHT * 0.55) + 100;
+            this._playButton.y = (config.Screen.HEIGHT * 0.65) + 100;
             this._stage.addChild(this._playButton);
             
             this._playButton.on("click", (event: createjs.MouseEvent) => {
@@ -92,24 +92,25 @@ module scenes {
                 changeScene();
             });
             
-            this._quitButton = new createjs.Bitmap(assets.getResult("exit"));
-            this._quitButton.scaleX = 0.25;
-            this._quitButton.scaleY = 0.25;
-            this._quitButton.regX = this._quitButton.getBounds().width * 0.5;
-            this._quitButton.regY = this._quitButton.getBounds().height * 0.5;
-            this._quitButton.x = config.Screen.WIDTH * 0.5;
-            this._quitButton.y = (config.Screen.HEIGHT * 0.65) + 100;
-            this._stage.addChild(this._quitButton);
+            this._menuButton = new createjs.Bitmap(assets.getResult("menu"));
+            this._menuButton.scaleX = 0.25;
+            this._menuButton.scaleY = 0.25;
+            this._menuButton.regX = this._menuButton.getBounds().width * 0.5;
+            this._menuButton.regY = this._menuButton.getBounds().height * 0.5;
+            this._menuButton.x = config.Screen.WIDTH * 0.5;
+            this._menuButton.y = (config.Screen.HEIGHT * 0.75) + 100;
+            this._stage.addChild(this._menuButton);
             
-            this._quitButton.on("click", (event: createjs.MouseEvent) => {
-                window.close();
+            this._menuButton.on("click", (event: createjs.MouseEvent) => {
+                currentScene = config.Scene.MENU;
+                changeScene();
             });
             
             // Add buttons to an array for hover events
             this._buttons = [];
             
             this._buttons[0] = this._playButton;
-            this._buttons[1] = this._quitButton;
+            this._buttons[1] = this._menuButton;
             
             // Loop through buttons
             for (var i = 0; i < this._buttons.length; i++){

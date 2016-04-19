@@ -1,3 +1,9 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Game Over Scene
+Revision History:   Live build - Part 4 (final)
+*/
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

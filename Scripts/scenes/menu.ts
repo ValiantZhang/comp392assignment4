@@ -1,3 +1,10 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Menu Scene
+Revision History:   Live build - Part 4 (final)
+*/
+
 /**
  * @module scenes
  */
@@ -89,7 +96,7 @@ module scenes {
             this._tutorialButton.regX = this._tutorialButton.getBounds().width * 0.5;
             this._tutorialButton.regY = this._tutorialButton.getBounds().height * 0.5;
             this._tutorialButton.x = config.Screen.WIDTH * 0.5;
-            this._tutorialButton.y = (config.Screen.HEIGHT * 0.45) + 100;
+            this._tutorialButton.y = (config.Screen.HEIGHT * 0.55) + 100;
             this._stage.addChild(this._tutorialButton);
             
             this._tutorialButton.on("click", (event: createjs.MouseEvent) => {
@@ -103,7 +110,7 @@ module scenes {
             this._playButton.regX = this._playButton.getBounds().width * 0.5;
             this._playButton.regY = this._playButton.getBounds().height * 0.5;
             this._playButton.x = config.Screen.WIDTH * 0.5;
-            this._playButton.y = (config.Screen.HEIGHT * 0.55) + 100;
+            this._playButton.y = (config.Screen.HEIGHT * 0.65) + 100;
             this._stage.addChild(this._playButton);
             
             this._playButton.on("click", (event: createjs.MouseEvent) => {
@@ -117,7 +124,7 @@ module scenes {
             this._quitButton.regX = this._quitButton.getBounds().width * 0.5;
             this._quitButton.regY = this._quitButton.getBounds().height * 0.5;
             this._quitButton.x = config.Screen.WIDTH * 0.5;
-            this._quitButton.y = (config.Screen.HEIGHT * 0.65) + 100;
+            this._quitButton.y = (config.Screen.HEIGHT * 0.75) + 100;
             this._stage.addChild(this._quitButton);
             
             this._quitButton.on("click", (event: createjs.MouseEvent) => {
@@ -165,6 +172,7 @@ module scenes {
          */
         public update(): void {
             this._stage.update();
+            this.simulate();
         }
 
         /**

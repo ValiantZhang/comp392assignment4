@@ -1,3 +1,11 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Game Over Scene
+Revision History:   Live build - Part 4 (final)
+*/
+
+
 /**
  * @module scenes
  */

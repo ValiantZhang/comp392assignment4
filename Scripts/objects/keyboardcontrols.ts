@@ -1,3 +1,10 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        KeyboardControls Class
+Revision History:   Live build - Part 4 (final)
+*/
+
 module objects {
     // KeyboardControls Class +++++++++++++++
     export class KeyboardControls {

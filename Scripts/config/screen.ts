@@ -1,4 +1,11 @@
-module config {
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Screen Class
+Revision History:   Live build - Part 4 (final)
+*/
+
+module config{
     export class Screen {
         static WIDTH:number = window.innerWidth;
         static HEIGHT:number = window.innerHeight;

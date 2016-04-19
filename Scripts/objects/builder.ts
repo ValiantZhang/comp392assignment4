@@ -1,3 +1,10 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Builder Class
+Revision History:   Live build - Part 4 (final)
+*/
+
 /**
  * The Builder module is a namespace to reference simplified creation methods
  * 
@@ -106,11 +113,10 @@ module builder {
             
             createjs.Sound.play("projectileFlight");
             rogueSphere.name = projectileName;
-            rogueSphere.setCcdMotionThreshold(0.1);
-            rogueSphere.setCcdSweptSphereRadius(0.2);
+            rogueSphere.setCcdMotionThreshold(0.000001);
+            rogueSphere.setCcdSweptSphereRadius(0.5);
             attachTo.add(rogueSphere);
             rogueSphere.addEventListener('collision', (object) => {
-                console.log("I hit"+object.name);
                 if (object.name === "standard") {
                     createjs.Sound.play("standardHit");
                     scoreValue += 100;
@@ -127,39 +133,6 @@ module builder {
                 }
             });
             rogueSphere.applyCentralImpulse(new Vector3( -launchYaw * launchPower*1.1, launchAngle * launchPower, -launchPower));
-        };
-        
-        
-        public createProjectileInQueue(posX: number, posY:number, posZ:number, 
-                          attachTo: THREE.Object3D, name: string): Physijs.Mesh {
-            var projectileGeometry  = new SphereGeometry(1, 15, 15);
-            var basicProjectileMaterial:LambertMaterial = new LambertMaterial({color:0x464646});
-            var projectilePhysMaterial = Physijs.createMaterial(basicProjectileMaterial, 0.9, 0.01);
-            var rogueSphere = new Physijs.SphereMesh(projectileGeometry, projectilePhysMaterial, 1000);
-            rogueSphere.position.set(posX, posY, posZ);
-            rogueSphere.name = name; 
-            rogueSphere.setCcdMotionThreshold(0.1);
-            rogueSphere.setCcdSweptSphereRadius(0.2);
-            
-            rogueSphere.addEventListener('collision', (object) => {
-                console.log("I hit"+object.name);
-                if (object.name === "standard") {
-                    createjs.Sound.play("standardHit");
-                    scoreValue += 100;
-                    scoreLabel.text = "SCORE: " + scoreValue;
-                    object.material.color= 0x464646;
-                    object.name="standard_hitted";
-                }
-                if (object.name === "golden") {
-                    createjs.Sound.play("goldenHit");
-                    scoreValue += 2500;
-                    scoreLabel.text = "SCORE: " + scoreValue;
-                    object.material.color = 0xFF0000;
-                    object.name="golden_hitted";
-                }
-            });
-            attachTo.add(rogueSphere);
-            return rogueSphere;
         };
         
         public shootProjectile(posX: number, posY:number, posZ:number,

@@ -1,3 +1,11 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Level 3 Scene
+Revision History:   Live build - Part 4 (final)
+*/
+
+
 /**
  * The Scenes module is a namespace to reference all scene objects
  * 
@@ -120,7 +128,7 @@ module scenes {
         private setupScoreboard(): void {
             // initialize  score and shots values
             scoreValue = 0;
-            shotsValue = 5;
+            shotsValue = 3;
 
             // Add shots Label
             shotsLabel = new createjs.Text(
@@ -131,7 +139,6 @@ module scenes {
             shotsLabel.x = config.Screen.WIDTH * 0.1;
             shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(shotsLabel);
-            console.log("Added shots Label to stage");
 
             // Add Score Label
             scoreLabel = new createjs.Text(
@@ -142,7 +149,6 @@ module scenes {
             scoreLabel.x = config.Screen.WIDTH * 0.8;
             scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(scoreLabel);
-            console.log("Added Score Label to stage");
             
             levelGoal = new createjs.Text(
                 "Level goal: " + this.scoreRequired,
@@ -152,7 +158,6 @@ module scenes {
             levelGoal.x = config.Screen.WIDTH * 0.35;
             levelGoal.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(levelGoal);
-            console.log("Added level goal to stage");
         }
 
         /**
@@ -178,7 +183,6 @@ module scenes {
             this.directionLight.shadowDarkness = 0.5;
             this.directionLight.name = "Directional Light";
             this.add(this.directionLight);
-            console.log("Added directional light to scene");
         }
         
         /**
@@ -191,7 +195,6 @@ module scenes {
             // Ambient Light
             this.ambientLight = new AmbientLight(0x303030);
             this.add(this.ambientLight);
-            console.log("Added an Ambient Light to Scene");
         }
 
         /**
@@ -209,7 +212,6 @@ module scenes {
             this.ground.name = "Ground";
             this.ground.position.set(0, -0.5, 0);
             this.add(this.ground);
-            console.log("Added Burnt Ground to scene");
         }
 
         /**
@@ -237,9 +239,6 @@ module scenes {
             this.directionLineGeometry.vertices.push(new Vector3(0, 0, -50)); // end of the line
             this.directionLine = new Line(this.directionLineGeometry, this.directionLineMaterial);
             this.player.add(this.directionLine);
-            console.log("Added DirectionLine to the Player");
-            
-            //console.log("Added Player to Scene");
         }
 
         /**
@@ -312,10 +311,6 @@ module scenes {
             cubeMan.add(cubeBody);
             cubeMan.position.set(x,y,z);
             this.add(cubeMan);
-            
-            //cubeHand.setAngularFactor(new Vector3(0, 0, 0));
-            //cubeHand.setAngularVelocity(new Vector3(0, 1, 0));
-           // cubeHand.applyCentralImpulse(new Vector3(0, 1, 0));
        }
        
         private generateLevel() : void{
@@ -351,16 +346,16 @@ module scenes {
          */
         pointerLockChange(event): void {
             //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
-            if (document.pointerLockElement === this.element /*||
+            if (document.pointerLockElement === this.element ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element*/){
+                document.webkitPointerLockElement === this.element){
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
                 this.blocker.style.display = 'none'; 
             } else {
                 // disable our mouse and keyboard controls
-                if (currentScene == 5) {
+                if (currentScene == 5 || currentScene == 0) {
                     this.blocker.style.display = 'none';
                     document.removeEventListener('pointerlockchange', this.pointerLockChange.bind(this), false);
                     document.removeEventListener('mozpointerlockchange', this.pointerLockChange.bind(this), false);
@@ -376,7 +371,6 @@ module scenes {
                 }
                 this.keyboardControls.enabled = false;
                 this.mouseControls.enabled = false;
-                console.log("PointerLock disabled");
             }
         }
 
@@ -388,7 +382,6 @@ module scenes {
          */
         private pointerLockError(event): void {
             this.instructions.style.display = '';
-            console.log("PointerLock Error Detected!!");
         }
 
         /**
@@ -417,7 +410,6 @@ module scenes {
          * @return void
          */
         private launchSphere(launchPower: number, launchAngle: number, launchYaw: number): void{
-             //console.log( this.projectileQueue );
              if (shotsValue > 0){
                 this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z - 2, 
                 this, launchPower, launchAngle, launchYaw);
@@ -439,8 +431,11 @@ module scenes {
                 var delta: number = (time - this.prevTime) / 1000;
                 
                 //ChargeBar
+                 if(shotsValue==0)
+                    return;
                 if (this.keyboardControls.charge){
                     chargePower += 5 * delta;
+                    createjs.Sound.play("charge");
                 }
                 else if(chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0){
                         this.launchSphere(chargePower * 5000, camera.rotation.x, camera.rotation.y);
@@ -461,9 +456,12 @@ module scenes {
             if (shotsValue == 0 && !this.levelTransitionInProgress){
                 this.levelTransitionInProgress=true;
                 setTimeout(() => {
-                    if (scoreValue < this.scoreRequired){
+                    
+                     setTimeout(() => {
+                          if (scoreValue < this.scoreRequired){
                         // Exit Pointer Lock
                         document.exitPointerLock();
+                        
                         this.children = []; // an attempt to clean up
                         this.player.remove(camera);
             
@@ -480,10 +478,21 @@ module scenes {
             
                         //go to next level
                         levelGoal.text = "You won!";
-                        currentScene = config.Scene.MENU;;
+                        currentScene = config.Scene.MENU;
+                        //this.blocker.style.display = "none";
                         changeScene();
                     }
-                }, 5000);
+                         
+                     },2000);
+                    
+                    if (scoreValue < this.scoreRequired){
+                       levelGoal.text = "Cubes dominated! try again";
+                       
+                    }
+                    else{
+                        levelGoal.text = "You won!";
+                    }
+                }, 4000);
             }
         }
 
@@ -509,7 +518,6 @@ module scenes {
                 this.element = document.body;
                 this.instructions.addEventListener('click', () => {
                     // Ask the user for pointer lock
-                    console.log("Requesting PointerLock");
                     this.element.requestPointerLock = this.element.requestPointerLock ||
                         this.element.mozRequestPointerLock ||
                         this.element.webkitRequestPointerLock;
@@ -543,12 +551,10 @@ module scenes {
 
             // create parent-child relationship with camera and player
             this.player.add(camera);
-            //camera.position.set(0,10,35);//CONSTANT
             
             // Add UI Elements
             this.addReticle();
             this.generateLevel();
-            this.simulate();
         }
 
         /**

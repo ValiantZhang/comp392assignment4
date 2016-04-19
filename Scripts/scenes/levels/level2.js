@@ -1,3 +1,9 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Level 2 Scene
+Revision History:   Live build - Part 4 (final)
+*/
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -24,7 +30,7 @@ var scenes;
         function Level2() {
             _super.call(this);
             this.creator = new builder.Creator();
-            this.scoreRequired = 2500; //Score required to pass the level
+            this.scoreRequired = 7500; //Score required to pass the level
             this.levelTransitionInProgress = false;
             this._initialize();
             this.start();
@@ -51,7 +57,7 @@ var scenes;
             // Create to HTMLElements
             this.blocker = document.getElementById("blocker");
             this.instructions = document.getElementById("instructions");
-            this.blocker.style.display = "none";
+            this.blocker.style.display = "block";
             // setup canvas for menu scene
             this._setupCanvas();
             this.prevTime = 0;
@@ -74,24 +80,21 @@ var scenes;
         Level2.prototype.setupScoreboard = function () {
             // initialize  score and shots values
             scoreValue = 0;
-            shotsValue = 5;
+            shotsValue = 4;
             // Add shots Label
             shotsLabel = new createjs.Text("Shots: " + shotsValue, "40px Consolas", "#ffffff");
             shotsLabel.x = config.Screen.WIDTH * 0.1;
             shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(shotsLabel);
-            console.log("Added shots Label to stage");
             // Add Score Label
             scoreLabel = new createjs.Text("Score: " + scoreValue, "40px Consolas", "#ffffff");
             scoreLabel.x = config.Screen.WIDTH * 0.8;
             scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(scoreLabel);
-            console.log("Added Score Label to stage");
             levelGoal = new createjs.Text("Level goal: " + this.scoreRequired, "40px Consolas", "#ffffff");
             levelGoal.x = config.Screen.WIDTH * 0.35;
             levelGoal.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(levelGoal);
-            console.log("Added level goal to stage");
         };
         /**
          * Add a directional light to the scene
@@ -116,7 +119,6 @@ var scenes;
             this.directionLight.shadowDarkness = 0.5;
             this.directionLight.name = "Directional Light";
             this.add(this.directionLight);
-            console.log("Added directional light to scene");
         };
         /**
          * Add an ambient light to the scene
@@ -128,7 +130,6 @@ var scenes;
             // Ambient Light
             this.ambientLight = new AmbientLight(0x303030);
             this.add(this.ambientLight);
-            console.log("Added an Ambient Light to Scene");
         };
         /**
          * Add a ground plane to the scene
@@ -137,19 +138,7 @@ var scenes;
          * @return void
          */
         Level2.prototype.addGround = function () {
-            /*this.groundTexture = new THREE.TextureLoader().load('../../Assets/images/GravelCobble.jpg');
-            this.groundTexture.wrapS = THREE.RepeatWrapping;
-            this.groundTexture.wrapT = THREE.RepeatWrapping;
-            this.groundTexture.repeat.set(8, 8);
-
-            this.groundTextureNormal = new THREE.TextureLoader().load('../../Assets/images/GravelCobbleNormal.png');
-            this.groundTextureNormal.wrapS = THREE.RepeatWrapping;
-            this.groundTextureNormal.wrapT = THREE.RepeatWrapping;
-            this.groundTextureNormal.repeat.set(8, 8);*/
             this.groundMaterial = new PhongMaterial({ color: 0x00FF00 });
-            /*this.groundMaterial.map = this.groundTexture;
-            this.groundMaterial.bumpMap = this.groundText
-            this.groundMaterial.bumpScale = 0.2;*/
             this.groundGeometry = new BoxGeometry(128, 1, 128);
             this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0.8, 0);
             this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
@@ -157,7 +146,6 @@ var scenes;
             this.ground.name = "Ground";
             this.ground.position.set(0, -0.5, 0);
             this.add(this.ground);
-            console.log("Added Burnt Ground to scene");
         };
         /**
          * Adds the player controller to the scene
@@ -181,8 +169,6 @@ var scenes;
             this.directionLineGeometry.vertices.push(new Vector3(0, 0, -50)); // end of the line
             this.directionLine = new Line(this.directionLineGeometry, this.directionLineMaterial);
             this.player.add(this.directionLine);
-            console.log("Added DirectionLine to the Player");
-            //console.log("Added Player to Scene");
         };
         /**
          * Adds the reticle to the camera
@@ -234,9 +220,9 @@ var scenes;
          */
         Level2.prototype.pointerLockChange = function (event) {
             //OMIT MOZ AND WEBKIT TO REMOVE SEMANTIC ERROR
-            if (document.pointerLockElement === this.element /*||
+            if (document.pointerLockElement === this.element ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element*/) {
+                document.webkitPointerLockElement === this.element) {
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
@@ -261,7 +247,6 @@ var scenes;
                 }
                 this.keyboardControls.enabled = false;
                 this.mouseControls.enabled = false;
-                console.log("PointerLock disabled");
             }
         };
         /**
@@ -272,7 +257,6 @@ var scenes;
          */
         Level2.prototype.pointerLockError = function (event) {
             this.instructions.style.display = '';
-            console.log("PointerLock Error Detected!!");
         };
         /**
          * This method checks the charge level and shows the appropriate textures
@@ -319,8 +303,11 @@ var scenes;
                 var time = performance.now();
                 var delta = (time - this.prevTime) / 1000;
                 //ChargeBar
+                if (shotsValue == 0)
+                    return;
                 if (this.keyboardControls.charge) {
                     chargePower += 5 * delta;
+                    createjs.Sound.play("charge");
                 }
                 else if (chargePower > 1 && !this.keyboardControls.charge && shotsValue > 0) {
                     this.launchSphere(chargePower * 5000, camera.rotation.x, camera.rotation.y);
@@ -374,7 +361,6 @@ var scenes;
             var self = this;
             // Set Up Scoreboard
             this.setupScoreboard();
-            shotsValue = 5;
             shotsLabel.text = "Shots:" + shotsValue;
             //check to see if pointerlock is supported
             this.havePointerLock = 'pointerLockElement' in document ||
@@ -384,8 +370,6 @@ var scenes;
             if (this.havePointerLock) {
                 this.element = document.body;
                 this.instructions.addEventListener('click', function () {
-                    // Ask the user for pointer lock
-                    console.log("Requesting PointerLock");
                     _this.element.requestPointerLock = _this.element.requestPointerLock ||
                         _this.element.mozRequestPointerLock ||
                         _this.element.webkitRequestPointerLock;
@@ -410,14 +394,11 @@ var scenes;
             this.addGround();
             // Add player controller
             this.addPlayer();
-            // Collision Check
             // create parent-child relationship with camera and player
             this.player.add(camera);
-            //camera.position.set(0,10,35);//CONSTANT
             // Add UI Elements
             this.addReticle();
             this.generateLevel();
-            this.simulate();
         };
         /**
          * Camera Look function

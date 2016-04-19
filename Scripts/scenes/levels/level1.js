@@ -1,3 +1,9 @@
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Level 1 Scene
+Revision History:   Live build - Part 4 (final)
+*/
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -24,6 +30,7 @@ var scenes;
         function Level1() {
             _super.call(this);
             this.creator = new builder.Creator();
+            this.bug = true;
             this.scoreRequired = 5000; //Score required to pass the level
             this.levelTransitionInProgress = false;
             this._initialize();
@@ -78,18 +85,15 @@ var scenes;
             shotsLabel.x = config.Screen.WIDTH * 0.1;
             shotsLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(shotsLabel);
-            console.log("Added shots Label to stage");
             // Add Score Label
             scoreLabel = new createjs.Text("Score: " + scoreValue, "40px Consolas", "#ffffff");
             scoreLabel.x = config.Screen.WIDTH * 0.8;
             scoreLabel.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(scoreLabel);
-            console.log("Added Score Label to stage");
             levelGoal = new createjs.Text("Level goal: " + this.scoreRequired, "40px Consolas", "#ffffff");
             levelGoal.x = config.Screen.WIDTH * 0.35;
             levelGoal.y = (config.Screen.HEIGHT * 0.15) * 0.20;
             this.stage.addChild(levelGoal);
-            console.log("Added level goal to stage");
         };
         /**
          * Add a directional light to the scene
@@ -114,7 +118,6 @@ var scenes;
             this.directionLight.shadowDarkness = 0.5;
             this.directionLight.name = "Directional Light";
             this.add(this.directionLight);
-            console.log("Added directional light to scene");
         };
         /**
          * Add an ambient light to the scene
@@ -126,7 +129,6 @@ var scenes;
             // Ambient Light
             this.ambientLight = new AmbientLight(0x303030);
             this.add(this.ambientLight);
-            console.log("Added an Ambient Light to Scene");
         };
         /**
          * Add a ground plane to the scene
@@ -135,19 +137,7 @@ var scenes;
          * @return void
          */
         Level1.prototype.addGround = function () {
-            /*this.groundTexture = new THREE.TextureLoader().load('../../Assets/images/GravelCobble.jpg');
-            this.groundTexture.wrapS = THREE.RepeatWrapping;
-            this.groundTexture.wrapT = THREE.RepeatWrapping;
-            this.groundTexture.repeat.set(8, 8);
-
-            this.groundTextureNormal = new THREE.TextureLoader().load('../../Assets/images/GravelCobbleNormal.png');
-            this.groundTextureNormal.wrapS = THREE.RepeatWrapping;
-            this.groundTextureNormal.wrapT = THREE.RepeatWrapping;
-            this.groundTextureNormal.repeat.set(8, 8);*/
             this.groundMaterial = new PhongMaterial({ color: 0x00FF00 });
-            /*this.groundMaterial.map = this.groundTexture;
-            this.groundMaterial.bumpMap = this.groundTextureNormal;
-            this.groundMaterial.bumpScale = 0.2;*/
             this.groundGeometry = new BoxGeometry(128, 1, 128);
             this.groundPhysicsMaterial = Physijs.createMaterial(this.groundMaterial, 0.4, 0.1);
             this.ground = new Physijs.ConvexMesh(this.groundGeometry, this.groundPhysicsMaterial, 0);
@@ -155,7 +145,6 @@ var scenes;
             this.ground.name = "Ground";
             this.ground.position.set(0, -0.5, 0);
             this.add(this.ground);
-            console.log("Added Burnt Ground to scene");
         };
         /**
          * Adds the player controller to the scene
@@ -179,8 +168,6 @@ var scenes;
             this.directionLineGeometry.vertices.push(new Vector3(0, 0, -50)); // end of the line
             this.directionLine = new Line(this.directionLineGeometry, this.directionLineMaterial);
             this.player.add(this.directionLine);
-            console.log("Added DirectionLine to the Player");
-            //console.log("Added Player to Scene");
         };
         /**
          * Adds the reticle to the camera
@@ -233,14 +220,13 @@ var scenes;
          */
         Level1.prototype.pointerLockChange = function (event) {
             //OMIT TO REMOVE MOZ/WEBKIT SEMANTIC ERROR
-            if (document.pointerLockElement === this.element /*||
+            if (document.pointerLockElement === this.element ||
                 document.mozPointerLockElement === this.element ||
-                document.webkitPointerLockElement === this.element*/) {
+                document.webkitPointerLockElement === this.element) {
                 // enable our mouse and keyboard controls
                 this.keyboardControls.enabled = true;
                 this.mouseControls.enabled = true;
                 this.blocker.style.display = 'none';
-                console.log("PointerLock enabled");
             }
             else {
                 // disable our mouse and keyboard controls
@@ -261,7 +247,6 @@ var scenes;
                 }
                 this.keyboardControls.enabled = false;
                 this.mouseControls.enabled = false;
-                console.log("PointerLock disabled");
             }
         };
         /**
@@ -272,7 +257,6 @@ var scenes;
          */
         Level1.prototype.pointerLockError = function (event) {
             this.instructions.style.display = '';
-            console.log("PointerLock Error Detected!!");
         };
         /**
          * This method checks the charge level and shows the appropriate textures
@@ -303,7 +287,6 @@ var scenes;
         * @return void
         */
         Level1.prototype.launchSphere = function (launchPower, launchAngle, launchYaw) {
-            //console.log( this.projectileQueue );
             if (shotsValue > 0) {
                 this.creator.createProjectile(this.player.position.x, this.player.position.y + 2, this.player.position.z - 2, this, launchPower, launchAngle, launchYaw);
             }
@@ -317,10 +300,11 @@ var scenes;
          */
         Level1.prototype.checkControls = function () {
             if (this.keyboardControls.enabled) {
-                //this.velocity = new Vector3();
                 var time = performance.now();
                 var delta = (time - this.prevTime) / 1000;
                 //ChargeBar
+                if (shotsValue == 0)
+                    return;
                 if (this.keyboardControls.charge) {
                     chargePower += 5 * delta;
                     createjs.Sound.play("charge");
@@ -362,7 +346,7 @@ var scenes;
                         currentScene = currentScene + 1;
                         changeScene();
                     }
-                }, 4000); //2 seconds not really enought I think  
+                }, 4000);
             }
         };
         // PUBLIC METHODS +++++++++++++++++++++++++++++++++++++++++++
@@ -374,6 +358,7 @@ var scenes;
         Level1.prototype.start = function () {
             var _this = this;
             var self = this;
+            //buggggs
             // Set Up Scoreboard
             this.setupScoreboard();
             //check to see if pointerlock is supported
@@ -385,7 +370,6 @@ var scenes;
                 this.element = document.body;
                 this.instructions.addEventListener('click', function () {
                     // Ask the user for pointer lock
-                    console.log("Requesting PointerLock");
                     _this.element.requestPointerLock = _this.element.requestPointerLock ||
                         _this.element.mozRequestPointerLock ||
                         _this.element.webkitRequestPointerLock;
@@ -410,21 +394,11 @@ var scenes;
             this.addGround();
             // Add player controller
             this.addPlayer();
-            // Collision Check
-            /*this.player.addEventListener('collision', function(eventObject) {
-                if (eventObject.name === "Ground") {
-                    this.isGrounded = true;
-                    createjs.Sound.play("land");
-                }
-            }.bind(this));
-            */
             // create parent-child relationship with camera and player
             this.player.add(camera);
-            //camera.position.set(0,10,35);//CONSTANT
             // Add UI Elements
             this.addReticle();
             this.generateLevel();
-            this.simulate();
         };
         /**
          * Camera Look function

@@ -1,4 +1,10 @@
 /// <reference path="_reference.ts"/>
+/*
+Author:             Josh Bender, Jacky Zhang, Ilmir Taychinov
+Last Modified:      19/04/2016
+Description:        Main Game file
+Revision History:   Live build - Part 4 (final)
+*/
 // MAIN GAME FILE
 // THREEJS Aliases
 var Scene = Physijs.Scene;
@@ -75,7 +81,7 @@ var manifest = [
     { id: "Level2Button", src: "../../Assets/images/level2.png" },
     { id: "Level3Button", src: "../../Assets/images/level3.png" },
     { id: "Logo", src: "../../Assets/images/logo.png" },
-    { id: "tutorial", src: "../../Assets/images/tutorial.png" },
+    { id: "tutorial", src: "../../Assets/images/tutorial2.png" },
     { id: "menu", src: "../../Assets/images/menu.png" },
     { id: "playAgain", src: "../../Assets/images/playAgain.png" },
     { id: "play", src: "../../Assets/images/play.png" },
@@ -145,14 +151,10 @@ function setupRenderer() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(CScreen.WIDTH, CScreen.HEIGHT);
     renderer.shadowMap.enabled = true;
-    console.log("Finished setting up Renderer...");
 }
 // Setup main camera for the scene
 function setupCamera() {
     camera = new PerspectiveCamera(35, config.Screen.RATIO, 0.1, 100);
-    //camera.position.set(0, 40, 30);
-    //camera.lookAt(new Vector3(0, 0, 0));
-    console.log("Finished setting up Camera...");
 }
 /**
  * Adds the chargeBar to the camera
@@ -191,37 +193,31 @@ function changeScene() {
             // show the MENU scene
             menu = new scenes.Menu();
             scene = menu;
-            console.log("Starting MENU Scene");
             break;
         case config.Scene.LEVEL1:
             // show the level 1 scene
             level1 = new scenes.Level1();
             scene = level1;
-            console.log("Starting level 1 Scene");
             break;
         case config.Scene.LEVEL2:
             // show the level 2 scene
             level2 = new scenes.Level2();
             scene = level2;
-            console.log("Starting level 2 Scene");
             break;
         case config.Scene.LEVEL3:
             // show the level 3 scene
             level3 = new scenes.Level3();
             scene = level3;
-            console.log("Starting level 3 Scene");
             break;
         case config.Scene.OVER:
             // show the game OVER scene
             over = new scenes.Over();
             scene = over;
-            console.log("Starting OVER Scene");
             break;
         case config.Scene.TUT:
             // show the tutorial scene
             tut = new scenes.Tutorial();
             scene = tut;
-            console.log("Starting Tutorial Scene");
             break;
     }
     createjs.Sound.play("lvlChng");
